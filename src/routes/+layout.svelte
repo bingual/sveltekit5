@@ -21,7 +21,7 @@
     if ($page.data.session?.user) {
       userInfo.set($page.data.session?.user);
     } else {
-      userInfo.set(null);
+      userInfo.set(undefined);
     }
   });
 </script>

@@ -17,10 +17,6 @@
   let isDemoOpen = $state(false);
   const closeDemoSidebar = demoSidebarUi.close;
 
-  $effect(() => {
-    isDemoOpen = demoSidebarUi.isOpen;
-  });
-
   interface Option {
     border: boolean;
   }
@@ -58,6 +54,10 @@
       ],
     },
   ];
+
+  $effect(() => {
+    isDemoOpen = demoSidebarUi.isOpen;
+  });
 </script>
 
 <SidebarButton onclick={demoSidebarUi.toggle} class="mb-2" />

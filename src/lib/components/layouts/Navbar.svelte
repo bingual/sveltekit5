@@ -89,7 +89,7 @@
                   {#snippet submitButton()}
                     <Button class="whitespace-nowrap" color="dark"
                       ><img
-                        class="me-2 h-6 w-6"
+                        class="me-2 h-5 w-5"
                         src="/provider/github-mark-white.svg"
                         alt="github mark"
                       />

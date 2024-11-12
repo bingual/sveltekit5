@@ -1,6 +1,7 @@
-import { get, type Writable, writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { localStorageManager } from '$lib/utils/variables.js';
 import { getContext } from 'svelte';
+import { page } from '$app/stores';
 
 const persistentStore = (key: string, startValue: any) => {
   const { loadFromLocalStorage, saveToLocalStorage } = localStorageManager();
@@ -16,7 +17,8 @@ const persistentStore = (key: string, startValue: any) => {
 };
 
 export const accountStore = () => {
-  const userInfo: Writable<any> = writable(null);
+  const userSession = get(page).data.session?.user;
+  const userInfo = writable<typeof userSession | undefined>(userSession);
 
   return {
     userInfo,

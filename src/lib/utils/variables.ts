@@ -3,9 +3,9 @@ import { browser } from '$app/environment';
 export const localStorageManager = () => {
   if (!browser) {
     return {
-      saveToLocalStorage: () => {},
-      loadFromLocalStorage: () => null,
-      clearLocalStorage: () => {},
+      saveToLocalStorage: () => undefined,
+      loadFromLocalStorage: () => undefined,
+      clearLocalStorage: () => undefined,
     };
   }
 
