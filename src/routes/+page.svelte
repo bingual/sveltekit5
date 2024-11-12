@@ -1,6 +1,4 @@
-<script lang="ts">
-  import { SignIn } from '@auth/sveltekit/components';
-</script>
+<script lang="ts"></script>
 
 <div class="container mx-auto">
   <article class="prose lg:prose-xl">
@@ -9,6 +7,4 @@
       <li><a href="/demo/paraglide">Paraglide Demo</a></li>
     </ul>
   </article>
-
-  <SignIn provider="github" signInPage="signin" />
 </div>
