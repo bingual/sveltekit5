@@ -15,7 +15,12 @@
     "test": "npm run test:unit -- --run && npm run test:e2e",
     "test:e2e": "playwright test",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "prisma:migrate": "dotenv -e .env.development -- pnpm prisma migrate dev",
+    "prisma:generate": "dotenv -e .env.development -- pnpm prisma generate",
+    "prisma:studio": "dotenv -e .env.development -- pnpm prisma studio",
+    "prisma:db-pull": "dotenv -e .env.development -- pnpm prisma db pull",
+    "prisma:db-push": "dotenv -e .env.development -- pnpm prisma db push"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.2",
@@ -55,7 +60,7 @@
     "prisma": "^5.22.0",
     "remeda": "^2.17.0",
     "storybook": "^8.4.2",
-    "svelte": "^5.1.15",
+    "svelte": "^5.1.16",
     "svelte-5-ui-lib": "^0.10.2",
     "svelte-check": "^4.0.7",
     "tailwind-merge": "^2.5.4",
@@ -76,7 +81,7 @@
     "date-fns-tz": "^3.2.0",
     "flowbite": "^2.5.2",
     "pretendard": "^1.3.9",
-    "sass": "^1.80.6",
+    "sass": "^1.80.7",
     "uuid": "^11.0.3",
     "zod": "^3.23.8"
   }
