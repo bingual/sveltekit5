@@ -7,21 +7,49 @@
   import Navbar from '$lib/components/layouts/Navbar.svelte';
   import Sidebar from '$lib/components/layouts/Sidebar.svelte';
   import Toast from '$lib/components/layouts/Toast.svelte';
-  import { accountStore, toastStore, useContext } from '$lib/utils/stores';
+  import { accountStore, modalStore, toastStore, useContext } from '$lib/utils/stores';
 
   let { children } = $props();
   setContext('toastStore', toastStore());
   setContext('accountStore', accountStore());
+  setContext('modalStore', modalStore());
 
-  const { accountStore: ContextAccountStore, toastStore: ContextToastStore } = useContext();
+  const {
+    accountStore: ContextAccountStore,
+    toastStore: ContextToastStore,
+    modalStore: ContextModalStore,
+  } = useContext();
   const { userInfo } = ContextAccountStore;
   const { toasts } = ContextToastStore;
+  const { modalState, resetModal } = ContextModalStore;
+
+  const { modalUi, currentModalName, modalNames } = modalState();
+
+  let ModalComponent: any = $state();
+
+  const loadComponent = async (name: string) => {
+    switch (name) {
+      case modalNames.SetMemo:
+        ModalComponent = (await import('$lib/components/modals/SetMemo.svelte')).default;
+        break;
+      default:
+        return undefined;
+    }
+  };
 
   $effect(() => {
     if ($page.data.session?.user) {
       userInfo.set($page.data.session?.user);
     } else {
       userInfo.set(undefined);
+    }
+
+    if ($currentModalName) {
+      loadComponent($currentModalName);
+    }
+
+    if (!modalUi.isOpen) {
+      resetModal();
     }
   });
 </script>
@@ -40,6 +68,10 @@
     </ParaglideJS>
   </div>
 </div>
+
+{#if ModalComponent}
+  {@render ModalComponent()}
+{/if}
 
 {#if $toasts}
   <Toast />
