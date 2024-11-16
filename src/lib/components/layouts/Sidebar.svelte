@@ -7,15 +7,20 @@
     SidebarButton,
     uiHelpers,
   } from 'svelte-5-ui-lib';
-  import { ChartOutline, EditSolid, ShoppingBagSolid } from 'flowbite-svelte-icons';
+  import { ChartOutline, PenNibOutline, LightbulbOutline, CogOutline } from 'flowbite-svelte-icons';
+  import { useContext } from '$lib/utils/stores';
+
+  const {
+    accountStore: { userInfo },
+  } = useContext();
 
   const spanClass = 'flex-1 ms-3 whitespace-nowrap';
   const iconClass =
     'h-5 w-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white';
 
-  const demoSidebarUi = uiHelpers();
-  let isDemoOpen = $state(false);
-  const closeDemoSidebar = demoSidebarUi.close;
+  const sidebarUi = uiHelpers();
+  let isOpen = $state(false);
+  const closeDemoSidebar = sidebarUi.close;
 
   interface Option {
     border: boolean;
@@ -33,10 +38,13 @@
     items: Item[];
   }
 
-  const itemList: Section[] = [
+  let sections: Section[] = $state([
     {
       options: [{ border: false }],
-      items: [{ label: '대쉬보드', href: '/', icon: ChartOutline }],
+      items: [
+        { label: '대쉬보드', href: '/', icon: ChartOutline },
+        ...($userInfo ? [{ label: '메모', href: '/memo', icon: PenNibOutline }] : []),
+      ],
     },
     {
       options: [{ border: true }],
@@ -44,36 +52,36 @@
         {
           label: '테스트',
           href: '/tests',
-          icon: ShoppingBagSolid,
+          icon: LightbulbOutline,
         },
         {
           label: '설정',
-          icon: EditSolid,
+          icon: CogOutline,
           children: [{ childLabel: '계정', childHref: '#' }],
         },
       ],
     },
-  ];
+  ]);
 
   $effect(() => {
-    isDemoOpen = demoSidebarUi.isOpen;
+    isOpen = sidebarUi.isOpen;
   });
 </script>
 
-<SidebarButton onclick={demoSidebarUi.toggle} class="mb-2" />
+<SidebarButton onclick={sidebarUi.toggle} class="mb-2" />
 <div class="relative">
   <Sidebar
     class="top-[61px] z-50 h-full"
     isSingle={false}
     backdrop={false}
-    isOpen={isDemoOpen}
+    {isOpen}
     closeSidebar={closeDemoSidebar}
     params={{ x: -50, duration: 50 }}
     position="fixed"
     activeClass="p-2"
     nonActiveClass="p-2"
   >
-    {#each itemList as section}
+    {#each sections as section}
       <SidebarGroup border={section.options[0].border}>
         {#each section.items as item}
           {#if item.children}

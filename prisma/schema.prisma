@@ -46,6 +46,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  Memo          Memo[]
 
   @@map("users")
 }
@@ -57,4 +58,28 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+// locals
+model Memo {
+  id         String      @id @default(cuid())
+  author     String
+  title      String      @db.VarChar(100)
+  content    String
+  created_at DateTime    @default(now()) @db.Timestamptz()
+  updated_at DateTime    @updatedAt @db.Timestamptz()
+  user       User        @relation(fields: [author], references: [id], onDelete: Cascade)
+  images     MemoImage[]
+
+  @@map("memos")
+}
+
+model MemoImage {
+  id     String @id @default(cuid())
+  url    String
+  memoId String @map("memo_id")
+
+  Memo Memo @relation(fields: [memoId], references: [id], onDelete: Cascade)
+
+  @@map("memo_images")
 }
