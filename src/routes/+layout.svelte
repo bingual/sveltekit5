@@ -2,24 +2,17 @@
   import { i18n } from '$lib/i18n';
   import { ParaglideJS } from '@inlang/paraglide-sveltekit';
   import '@/app.pcss';
-  import { page } from '$app/stores';
   import { setContext } from 'svelte';
   import Navbar from '$lib/components/layouts/Navbar.svelte';
   import Sidebar from '$lib/components/layouts/Sidebar.svelte';
   import Toast from '$lib/components/layouts/Toast.svelte';
-  import { accountStore, modalStore, toastStore, useContext } from '$lib/utils/stores';
+  import { modalStore, toastStore, useContext } from '$lib/utils/stores';
 
   let { children } = $props();
   setContext('toastStore', toastStore());
-  setContext('accountStore', accountStore());
   setContext('modalStore', modalStore());
 
-  const {
-    accountStore: ContextAccountStore,
-    toastStore: ContextToastStore,
-    modalStore: ContextModalStore,
-  } = useContext();
-  const { userInfo } = ContextAccountStore;
+  const { toastStore: ContextToastStore, modalStore: ContextModalStore } = useContext();
   const { toasts } = ContextToastStore;
   const { modalState, resetModal } = ContextModalStore;
 
@@ -38,12 +31,6 @@
   };
 
   $effect(() => {
-    if ($page.data.session?.user) {
-      userInfo.set($page.data.session?.user);
-    } else {
-      userInfo.set(undefined);
-    }
-
     if ($currentModalName) {
       loadComponent($currentModalName);
     }

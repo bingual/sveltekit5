@@ -16,11 +16,11 @@
     "test:e2e": "playwright test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prisma:migrate": "dotenv -e .env.development -- pnpm prisma migrate dev",
-    "prisma:generate": "dotenv -e .env.development -- pnpm prisma generate",
-    "prisma:studio": "dotenv -e .env.development -- pnpm prisma studio",
-    "prisma:db-pull": "dotenv -e .env.development -- pnpm prisma db pull",
-    "prisma:db-push": "dotenv -e .env.development -- pnpm prisma db push"
+    "prisma:migrate": "dotenv -e .env.prod -- pnpm prisma migrate deploy",
+    "prisma:generate": "dotenv -e .env.prod -- pnpm prisma generate",
+    "prisma:studio": "dotenv -e .env.prod -- pnpm prisma studio",
+    "prisma:db-pull": "dotenv -e .env.prod -- pnpm prisma db pull",
+    "prisma:db-push": "dotenv -e .env.prod -- pnpm prisma db push"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.2",

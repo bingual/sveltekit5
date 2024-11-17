@@ -17,7 +17,8 @@
   import { sineIn } from 'svelte/easing';
   import { page } from '$app/stores';
   import { SignIn, SignOut } from '@auth/sveltekit/components';
-  import { useContext } from '$lib/utils/stores';
+
+  const userInfo = $derived($page.data.session?.user);
 
   let nav = uiHelpers();
   let navStatus = $state(false);
@@ -27,9 +28,6 @@
   let closeDropdownUser = dropdownUser.close;
 
   let fluid = $state(true);
-
-  const { accountStore } = useContext();
-  const { userInfo } = accountStore;
 
   $effect(() => {
     dropdownUserStatus = dropdownUser.isOpen;
@@ -48,7 +46,7 @@
         <!-- FIXME: dot 속성이 없거나 삼항연산자로 동적 할당할 때 버그있음 -->
         <Avatar
           onclick={dropdownUser.toggle}
-          src={$userInfo?.image ? $userInfo.image : ''}
+          src={userInfo?.image ? userInfo.image : ''}
           dot={{ color: 'green' }}
         />
         <div class="relative flex justify-center">
@@ -58,10 +56,10 @@
             params={{ y: 0, duration: 200, easing: sineIn }}
             class="absolute top-3 w-auto -translate-x-1/2 transform"
           >
-            {#if $userInfo}
+            {#if userInfo}
               <DropdownHeader class="px-4 py-2">
-                <span class="block text-sm text-gray-900 dark:text-white">{$userInfo.name}</span>
-                <span class="block truncate text-sm font-medium">{$userInfo.email}</span>
+                <span class="block text-sm text-gray-900 dark:text-white">{userInfo.name}</span>
+                <span class="block truncate text-sm font-medium">{userInfo.email}</span>
               </DropdownHeader>
 
               <DropdownUl>

@@ -8,11 +8,9 @@
     uiHelpers,
   } from 'svelte-5-ui-lib';
   import { ChartOutline, PenNibOutline, LightbulbOutline, CogOutline } from 'flowbite-svelte-icons';
-  import { useContext } from '$lib/utils/stores';
+  import { page } from '$app/stores';
 
-  const {
-    accountStore: { userInfo },
-  } = useContext();
+  const userInfo = $derived($page.data.session?.user);
 
   const spanClass = 'flex-1 ms-3 whitespace-nowrap';
   const iconClass =
@@ -38,12 +36,12 @@
     items: Item[];
   }
 
-  let sections: Section[] = $state([
+  const sections: Section[] = $derived([
     {
       options: [{ border: false }],
       items: [
         { label: '대쉬보드', href: '/', icon: ChartOutline },
-        ...($userInfo ? [{ label: '메모', href: '/memo', icon: PenNibOutline }] : []),
+        ...(userInfo ? [{ label: '메모', href: '/memo', icon: PenNibOutline }] : []),
       ],
     },
     {

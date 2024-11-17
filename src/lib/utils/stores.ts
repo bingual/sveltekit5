@@ -1,7 +1,6 @@
 import { get, type Writable, writable } from 'svelte/store';
 import { localStorageManager } from '$lib/utils/variables.js';
 import { getContext } from 'svelte';
-import { page } from '$app/stores';
 import { uiHelpers } from 'svelte-5-ui-lib';
 
 const persistentStore = (key: string, startValue: any) => {
@@ -15,15 +14,6 @@ const persistentStore = (key: string, startValue: any) => {
   });
 
   return store;
-};
-
-export const accountStore = () => {
-  const userSession = get(page).data.session?.user;
-  const userInfo = writable<typeof userSession | undefined>(userSession);
-
-  return {
-    userInfo,
-  };
 };
 
 export const toastStore = () => {
@@ -102,7 +92,7 @@ export const modalStore = () => {
     modalButtonLabels: { confirm: '확인', cancel: '취소' },
   };
 
-  const currentModalName = writable<ModalNameType>('');
+  const currentModalName = writable(defaultValue.currentModalName);
 
   const modalUi = uiHelpers();
   const modalTitle = writable(defaultValue.modalTitle);
@@ -118,7 +108,7 @@ export const modalStore = () => {
 
   const setModal = () => {
     const activeModal = (
-      name: ModalNameType,
+      name: DefaultValueType['currentModalName'],
       title?: DefaultValueType['modalTitle'],
       buttons?: DefaultValueType['modalButtonLabels'],
     ) => {
@@ -156,16 +146,13 @@ export const modalStore = () => {
 };
 
 type ToastStore = ReturnType<typeof toastStore>;
-type AccountStore = ReturnType<typeof accountStore>;
 type ModalStore = ReturnType<typeof modalStore>;
 export const useContext = () => {
   const toastStore = getContext<ToastStore>('toastStore');
-  const accountStore = getContext<AccountStore>('accountStore');
   const modalStore = getContext<ModalStore>('modalStore');
 
   return {
     toastStore,
-    accountStore,
     modalStore,
   };
 };
