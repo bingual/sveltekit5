@@ -8,6 +8,7 @@ declare global {
     // interface PageState {}
     // interface Platform {}
   }
+  type ActionType = 'create' | 'update' | 'delete';
 }
 
 export {};

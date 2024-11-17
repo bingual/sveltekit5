@@ -1,27 +1,48 @@
 <script lang="ts">
-  import { Modal, Button } from 'svelte-5-ui-lib';
+  import { Modal, Button, Input, Textarea, Label } from 'svelte-5-ui-lib';
   import { useContext } from '$lib/utils/stores';
-  import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
+  import { actionMap } from '$lib/utils/mapping';
 
   const {
     modalStore: { modalState, setModal },
   } = useContext();
-  const { modalUi } = modalState();
+  const { modalUi, modalProps } = modalState();
   const { modalTitle, modalButtonLabels } = setModal();
 
-  let modalStatus = $state(false);
   const closeModal = modalUi.close;
+  let modalStatus = $state(false);
 
   $effect(() => {
     modalStatus = modalUi.isOpen;
   });
 </script>
 
-<Modal title={$modalTitle} {modalStatus} {closeModal} size="sm" dismissable={true}>
-  <div class="text-center">
-    <ExclamationCircleOutline class="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-200" />
-    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">테스트 메모 모달</h3>
-    <Button color="red" class="me-2" onclick={closeModal}>{$modalButtonLabels.confirm}</Button>
-    <Button color="alternative" onclick={closeModal}>{$modalButtonLabels.cancel}</Button>
-  </div>
+<!-- TODO: 유효성 검사 피드백 기능 구현 -->
+<Modal title={$modalTitle} {modalStatus} {closeModal} size="md" dismissable={true}>
+  <form method="POST" action={`/memo?/${actionMap($modalProps?.action).actionType}`}>
+    <Input type="hidden" name="id" value={$modalProps?.data?.id} />
+
+    <article>
+      <div>
+        <Label class="mb-2 space-y-2"><span>제목</span></Label>
+        <Input type="text" name="title" value={$modalProps?.data?.title} />
+      </div>
+
+      <div class="mt-5">
+        <Label class="my-2 space-y-2"><span>내용</span></Label>
+        <Textarea
+          class="mt-2 resize-none"
+          name="content"
+          value={$modalProps?.data?.content}
+          rows={15}
+          required
+        />
+      </div>
+    </article>
+
+    <article class="mt-2">
+      <Button type="submit" color="primary" class="me-2">{$modalButtonLabels.confirm}</Button>
+      <Button color="alternative" onclick={closeModal}>{$modalButtonLabels.cancel}</Button>
+    </article>
+  </form>
 </Modal>

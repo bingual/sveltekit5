@@ -84,12 +84,14 @@ export const modalStore = () => {
       confirm?: string;
       cancel?: string;
     };
+    modalProps?: { data?: any; action?: ActionType };
   };
 
   const defaultValue: DefaultValueType = {
     currentModalName: '',
     modalTitle: '',
     modalButtonLabels: { confirm: '확인', cancel: '취소' },
+    modalProps: undefined,
   };
 
   const currentModalName = writable(defaultValue.currentModalName);
@@ -97,12 +99,14 @@ export const modalStore = () => {
   const modalUi = uiHelpers();
   const modalTitle = writable(defaultValue.modalTitle);
   const modalButtonLabels = writable(defaultValue.modalButtonLabels);
+  const modalProps = writable<DefaultValueType['modalProps']>(defaultValue.modalProps);
 
   const modalState = () => {
     return {
+      currentModalName,
       modalUi,
       modalNames,
-      currentModalName,
+      modalProps,
     };
   };
 
@@ -111,17 +115,14 @@ export const modalStore = () => {
       name: DefaultValueType['currentModalName'],
       title?: DefaultValueType['modalTitle'],
       buttons?: DefaultValueType['modalButtonLabels'],
+      props?: any,
     ) => {
       currentModalName.set(name);
       modalUi.toggle();
 
-      if (title) {
-        modalTitle.set(title);
-      }
-
-      if (buttons) {
-        modalButtonLabels.set(buttons);
-      }
+      if (title) modalTitle.set(title);
+      if (buttons) modalButtonLabels.set(buttons);
+      if (props) modalProps.set(props);
     };
 
     return {
@@ -136,6 +137,7 @@ export const modalStore = () => {
 
     modalTitle.set(defaultValue.modalTitle);
     modalButtonLabels.set(defaultValue.modalButtonLabels);
+    modalProps.set(defaultValue.modalProps);
   };
 
   return {
