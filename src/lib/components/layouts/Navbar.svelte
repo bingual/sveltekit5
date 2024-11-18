@@ -105,7 +105,9 @@
 
     <NavUl class="order-1">
       <NavLi href="/">대쉬보드</NavLi>
-      <NavLi href="/tests">테스트</NavLi>
+      {#if userInfo}
+        <NavLi href="/tests">테스트</NavLi>
+      {/if}
     </NavUl>
   </Navbar>
 </div>

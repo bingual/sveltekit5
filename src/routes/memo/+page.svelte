@@ -4,6 +4,8 @@
   import { Button, Card, Input } from 'svelte-5-ui-lib';
   import { EditOutline, TrashBinOutline } from 'flowbite-svelte-icons';
   import { actionMap } from '$lib/utils/mapping';
+  import type { Memo } from '@prisma/client';
+  import { enhance } from '$app/forms';
 
   const {
     modalStore,
@@ -14,7 +16,7 @@
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
-  const handleModal = (action: ActionType, data?: any) => {
+  const handleModal = (action: ActionType, data?: Memo) => {
     const actionMap = {
       create: {
         modalTitle: '메모 생성',
@@ -47,17 +49,17 @@
     }
   });
 
-  const handleDelete = (event: SubmitEvent) => {
-    event.preventDefault();
-
-    const isConfirmed = confirm('정말로 삭제하시겠습니까?');
-    if (isConfirmed) {
-      (event.target as HTMLFormElement).submit();
-    }
+  const handleDelete = () => {
+    return async ({ update }) => {
+      const isConfirmed = confirm('정말로 삭제하시겠습니까?');
+      if (isConfirmed) {
+        update();
+      }
+    };
   };
 </script>
 
-<div class="container mx-auto">
+<div class="mx-auto @container">
   <div class="grid grid-cols-2 gap-3 xl:grid-cols-3">
     {#each data.memos as memo}
       <Card size="md">
@@ -67,7 +69,7 @@
         </article>
         <div class="mt-5 flex gap-x-2">
           <Button onclick={() => handleModal('update', memo)}><EditOutline /></Button>
-          <form onsubmit={handleDelete} method="POST" action="?/delete">
+          <form use:enhance={handleDelete} method="POST" action="?/delete">
             <Input type="hidden" name="id" value={memo.id} />
             <Button type="submit"><TrashBinOutline /></Button>
           </form>

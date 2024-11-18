@@ -47,11 +47,15 @@
     {
       options: [{ border: true }],
       items: [
-        {
-          label: '테스트',
-          href: '/tests',
-          icon: LightbulbOutline,
-        },
+        ...(userInfo
+          ? [
+              {
+                label: '테스트',
+                href: '/tests',
+                icon: LightbulbOutline,
+              },
+            ]
+          : []),
         {
           label: '설정',
           icon: CogOutline,

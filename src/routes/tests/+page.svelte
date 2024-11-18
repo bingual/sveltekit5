@@ -6,6 +6,6 @@
   const { addToast } = toastStore;
 </script>
 
-<div class="container mx-auto">
+<div class="mx-auto @container">
   <Button onclick={() => addToast('테스트 토스트 메세지')}>토스트 메세지 생성</Button>
 </div>
