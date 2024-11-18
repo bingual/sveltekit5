@@ -3,10 +3,11 @@
   import type { Memo } from '@prisma/client';
   import { useContext } from '$lib/utils/stores';
   import { Button, Card, Input } from 'svelte-5-ui-lib';
-  import { EditOutline, TrashBinOutline } from 'flowbite-svelte-icons';
+  import { EditOutline, TrashBinOutline, PenNibOutline } from 'flowbite-svelte-icons';
   import { actionMap } from '$lib/utils/mapping';
   import { enhance } from '$app/forms';
   import { useLoadMore } from '$lib/utils/variables';
+  import { goto } from '$app/navigation';
 
   const {
     modalStore: { setModal },
@@ -60,31 +61,55 @@
 </script>
 
 <div class="mx-auto @container">
-  <div class="grid grid-cols-2 gap-3 xl:grid-cols-3">
+  <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
     {#each data.memos as memo}
       <Card size="md" class="relative">
-        <article class="prose pb-16 lg:prose-lg xl:prose-xl">
+        <div class="prose pb-16 lg:prose-lg xl:prose-xl">
           <h3>{memo.title}</h3>
           <p>{memo.content}</p>
-        </article>
+        </div>
 
         <div class="absolute bottom-3 left-3 flex gap-x-2 p-3">
-          <Button onclick={() => handleModal('update', memo)}><EditOutline /></Button>
+          <Button color="green" onclick={() => handleModal('update', memo)}><EditOutline /></Button>
           <form use:enhance={handleDelete} method="POST" action="?/delete">
             <Input type="hidden" name="id" value={memo.id} />
-            <Button type="submit"><TrashBinOutline /></Button>
+            <Button color="red" type="submit"><TrashBinOutline /></Button>
           </form>
         </div>
       </Card>
     {/each}
   </div>
 
-  <!-- TODO: 테스트용, 나중에 디자인 해야함 -->
-  <div class="mt-3">
-    <Button size="lg" onclick={() => handleModal('create')}>메모 생성</Button>
+  <div class="fixed bottom-5 right-5">
+    <Button size="lg" shadow onclick={() => handleModal('create')}
+      ><PenNibOutline size="xl" /></Button
+    >
+  </div>
 
-    {#if data.memoTotalCount > $currentTake}
-      <Button class="mt-3 w-full" size="lg" onclick={loadMoreData}>더 보기</Button>
-    {/if}
+  <div class="mt-3 flex items-center justify-center">
+    <div class="w-full text-center">
+      {#if data.memoTotalCount > $currentTake}
+        <div>
+          <Button
+            class="mx-auto mt-10 w-1/2 rounded-none"
+            size="lg"
+            color="dark"
+            onclick={loadMoreData}>더 보기</Button
+          >
+        </div>
+      {/if}
+
+      <div class="mt-2">
+        {`${data.memoTotalCount}개 목록 중 ${data.memos.length}개를 보셨습니다.`}
+      </div>
+
+      {#if data.memoTotalCount <= $currentTake}
+        <div class="mt-2">
+          <button class="underline" onclick={async () => await goto('#')}
+            >첫 번째 페이지로 이동</button
+          >
+        </div>
+      {/if}
+    </div>
   </div>
 </div>

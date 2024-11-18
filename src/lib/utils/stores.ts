@@ -50,7 +50,7 @@ export const toastStore = () => {
   };
 
   const restoreCounters = () => {
-    const currentToasts = get(toasts!);
+    const currentToasts = get(toasts);
     currentToasts.forEach((toast) => {
       if (toast.status && toast.counter > 0) {
         decrementCounter(toast.id);
@@ -104,6 +104,7 @@ export const modalStore = () => {
   const modalState = () => {
     return {
       currentModalName,
+
       modalNames,
       modalUi,
       modalTitle,

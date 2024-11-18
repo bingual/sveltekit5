@@ -35,18 +35,19 @@ export const localStorageManager = () => {
 
 export const useLoadMore = () => {
   const key = 'take';
+  const interval = 10;
   const url = get(page).url;
-  const currentTake = writable(10);
+  const currentTake = writable(interval);
 
-  const unsubscribe = page.subscribe(($page) => {
-    const url = $page.url;
-    currentTake.set(Number(url.searchParams.get(key)) || 10);
+  const unsubscribe = page.subscribe((value) => {
+    const url = value.url;
+    currentTake.set(Number(url.searchParams.get(key)) || interval);
   });
 
   const loadMoreData = async () => {
     if (!browser) return;
 
-    currentTake.update((value) => value + 10);
+    currentTake.update((value) => value + interval);
 
     url.searchParams.set(key, String(get(currentTake)));
     await goto(url.toString(), { replaceState: true, noScroll: true });

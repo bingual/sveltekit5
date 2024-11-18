@@ -18,8 +18,11 @@
 
   const handleSubmit: SubmitFunction = () => {
     return async ({ result, update }) => {
-      if (result.type === 'failure' && !result?.data?.status && !isEmpty(result?.data?.errors)) {
-        errors = result.data.errors;
+      if (result.type === 'failure') {
+        const validRes = result.data as ValidationResponse;
+        if (!validRes?.status && !isEmpty(validRes.errors)) {
+          errors = validRes.errors;
+        }
       } else {
         await update();
         closeModal();
@@ -48,7 +51,7 @@
     action={`/memo?/${actionMap($modalProps?.action).actionType}`}
   >
     <Input type="hidden" name="id" value={$modalProps?.data?.id} />
-    <article>
+    <div>
       <div>
         <Label class="mb-2 space-y-2" for="title"><span>제목</span></Label>
         <Input type="text" id="title" name="title" value={$modalProps?.data?.title} required />
@@ -65,12 +68,10 @@
           required
         />
       </div>
-    </article>
+    </div>
   </form>
   {#snippet footer()}
-    <Button type="submit" form="SetMemoForm" color="primary" class="me-2"
-      >{$modalButtonLabels.confirm}</Button
-    >
+    <Button type="submit" form="SetMemoForm" color="primary">{$modalButtonLabels.confirm}</Button>
     <Button color="alternative" onclick={closeModal}>{$modalButtonLabels.cancel}</Button>
   {/snippet}
 </Modal>
