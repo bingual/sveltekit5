@@ -24,11 +24,16 @@
     border: boolean;
   }
 
+  interface ChildItem {
+    childLabel: string;
+    childHref: string;
+  }
+
   interface Item {
     label: string;
     href?: string;
     icon: any;
-    children?: [{ childLabel: string; childHref: string }];
+    children?: ChildItem[];
   }
 
   interface Section {
@@ -51,8 +56,8 @@
           ? [
               {
                 label: '테스트',
-                href: '/tests',
                 icon: LightbulbOutline,
+                children: [{ childLabel: '데이터 생성/제거', childHref: '/tests/fake-data' }],
               },
             ]
           : []),

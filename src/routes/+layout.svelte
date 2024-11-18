@@ -49,7 +49,7 @@
 
 <div class="overflow-hidden lg:flex">
   <Sidebar />
-  <div class="relative h-full w-full overflow-y-auto px-2 pb-2 pt-[70px] md:ml-64 lg:ml-72">
+  <div class="relative h-full w-full overflow-y-auto px-6 pb-4 pt-6 md:ml-64 md:pt-20">
     <ParaglideJS {i18n}>
       {@render children()}
     </ParaglideJS>

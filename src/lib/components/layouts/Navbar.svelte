@@ -14,23 +14,30 @@
     DropdownFooter,
     Button,
   } from 'svelte-5-ui-lib';
+  import { ChevronDownOutline } from 'flowbite-svelte-icons';
   import { sineIn } from 'svelte/easing';
   import { page } from '$app/stores';
   import { SignIn, SignOut } from '@auth/sveltekit/components';
 
   const userInfo = $derived($page.data.session?.user);
 
+  // for navbar
   let nav = uiHelpers();
   let navStatus = $state(false);
   let toggleNav = nav.toggle;
   let dropdownUser = uiHelpers();
   let dropdownUserStatus = $state(false);
   let closeDropdownUser = dropdownUser.close;
-
   let fluid = $state(true);
+
+  // for Dropdown
+  let dropdown = uiHelpers();
+  let dropdownStatus = $state(false);
+  let closeDropdown = dropdown.close;
 
   $effect(() => {
     dropdownUserStatus = dropdownUser.isOpen;
+    dropdownStatus = dropdown.isOpen;
     navStatus = nav.isOpen;
   });
 </script>
@@ -103,10 +110,27 @@
       </div>
     {/snippet}
 
+    <!-- TODO: 나중에 햄버거 메뉴 클릭 시 Sidebar 컴포넌트 불러올 예정, 지금은 svelte-5-ui-lib 베타버전이라 NavUl이 필수 값이라 사용중. -->
     <NavUl class="order-1">
       <NavLi href="/">대쉬보드</NavLi>
       {#if userInfo}
-        <NavLi href="/tests">테스트</NavLi>
+        <NavLi href="/memo">메모</NavLi>
+        <NavLi class="cursor-pointer" onclick={dropdown.toggle}
+          >테스트<ChevronDownOutline
+            class="ms-2 inline h-6 w-6 text-primary-800 dark:text-white"
+          /></NavLi
+        >
+        <div class="relative">
+          <Dropdown
+            {dropdownStatus}
+            {closeDropdown}
+            class="absolute -top-[20px] left-[100px] md:-left-[170px] md:top-[20px]"
+          >
+            <DropdownUl>
+              <DropdownLi href="/tests/fake-data">데이터 생성/삭제</DropdownLi>
+            </DropdownUl>
+          </Dropdown>
+        </div>
       {/if}
     </NavUl>
   </Navbar>
