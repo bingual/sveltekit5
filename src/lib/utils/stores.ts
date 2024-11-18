@@ -104,32 +104,26 @@ export const modalStore = () => {
   const modalState = () => {
     return {
       currentModalName,
-      modalUi,
       modalNames,
+      modalUi,
+      modalTitle,
+      modalButtonLabels,
       modalProps,
     };
   };
 
-  const setModal = () => {
-    const activeModal = (
-      name: DefaultValueType['currentModalName'],
-      title?: DefaultValueType['modalTitle'],
-      buttons?: DefaultValueType['modalButtonLabels'],
-      props?: any,
-    ) => {
-      currentModalName.set(name);
-      modalUi.toggle();
+  const setModal = (
+    name: DefaultValueType['currentModalName'],
+    title?: DefaultValueType['modalTitle'],
+    buttons?: DefaultValueType['modalButtonLabels'],
+    props?: any,
+  ) => {
+    currentModalName.set(name);
+    modalUi.toggle();
 
-      if (title) modalTitle.set(title);
-      if (buttons) modalButtonLabels.set(buttons);
-      if (props) modalProps.set(props);
-    };
-
-    return {
-      modalTitle,
-      modalButtonLabels,
-      activeModal,
-    };
+    if (title) modalTitle.set(title);
+    if (buttons) modalButtonLabels.set(buttons);
+    if (props) modalProps.set(props);
   };
 
   const resetModal = () => {

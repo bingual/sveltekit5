@@ -3,21 +3,32 @@ import { prisma } from '$lib/prisma';
 import { FormDataSchema } from './schema';
 import { fail, redirect } from '@sveltejs/kit';
 
-// TODO: 더보기 기능 구현
-export const load: PageServerLoad = async ({ parent }) => {
+export const load: PageServerLoad = async ({ parent, url }) => {
   const { session } = await parent();
 
-  const memos = await prisma.memo.findMany({
-    where: {
-      author: session?.user?.id,
-    },
-    orderBy: {
-      created_at: 'desc',
-    },
-  });
+  const searchParams = url.searchParams;
+  const take = Number(searchParams.get('take')) || 10;
+
+  const [memos, memoTotalCount] = await Promise.all([
+    prisma.memo.findMany({
+      where: {
+        author: session?.user?.id,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+      take,
+    }),
+    prisma.memo.count({
+      where: {
+        author: session?.user?.id,
+      },
+    }),
+  ]);
 
   return {
     memos,
+    memoTotalCount,
   };
 };
 
@@ -57,9 +68,7 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
           return {
             success: true,
             action: 'delete' as ActionType,
-            result: {
-              data: res,
-            },
+            data: res,
           };
         }
       } else {
@@ -67,9 +76,7 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
           field: err.path[0],
           message: err.message,
         }));
-
-        console.error(errors);
-        return fail(400, { error: true, errors });
+        return fail(400, { status: false, errors });
       }
     } else {
       const formValidation = FormDataSchema.safeParse(formData);
@@ -89,9 +96,7 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
             return {
               success: true,
               action: 'create' as ActionType,
-              result: {
-                data: res,
-              },
+              data: res,
             };
           }
         } else if (actionType === 'update') {
@@ -111,9 +116,7 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
             return {
               success: true,
               action: 'update' as ActionType,
-              result: {
-                data: res,
-              },
+              data: res,
             };
           }
         }
@@ -123,8 +126,7 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
           message: err.message,
         }));
 
-        console.error(errors);
-        return fail(400, { error: true, errors });
+        return fail(400, { status: false, errors });
       }
     }
   } catch (err) {

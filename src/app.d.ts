@@ -16,7 +16,7 @@ declare global {
   }
 
   interface ValidationResponse {
-    error: boolean;
+    status: boolean;
     errors: ValidationError[];
   }
 
