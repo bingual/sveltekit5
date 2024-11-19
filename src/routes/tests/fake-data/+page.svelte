@@ -30,7 +30,7 @@
 </script>
 
 <div class="mx-auto @container">
-  <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+  <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
     <Card size="sm">
       <div class="prose lg:prose-lg xl:prose-xl">
         <h3>메모 데이터 생성</h3>

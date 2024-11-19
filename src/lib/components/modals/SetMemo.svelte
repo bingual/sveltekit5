@@ -39,7 +39,8 @@
   });
 </script>
 
-<Modal title={$modalTitle} {modalStatus} {closeModal} size="md" dismissable={true}>
+<!-- FIXME: 현재 svelte-5-ui-lib 베타버전 모달은 X축 반응형 동작에 버그있음. 모바일 환경에서 치명적임-->
+<Modal title={$modalTitle} {modalStatus} {closeModal}>
   {#if !isEmpty(errors)}
     <Alert {errors} />
   {/if}

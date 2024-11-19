@@ -26,7 +26,7 @@
         props: { action },
       },
       update: {
-        modalTitle: `'${data?.title}' 메모 수정`,
+        modalTitle: `메모 수정`,
         modalButtonLabels: { confirm: '수정', cancel: '취소' },
         props: { data, action },
       },
@@ -61,7 +61,8 @@
 </script>
 
 <div class="mx-auto @container">
-  <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+  <!-- 그리드 -->
+  <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
     {#each data.memos as memo}
       <Card size="md" class="relative">
         <div class="prose pb-16 lg:prose-lg xl:prose-xl">
@@ -80,23 +81,13 @@
     {/each}
   </div>
 
-  <div class="fixed bottom-5 right-5">
-    <Button size="lg" shadow onclick={() => handleModal('create')}
-      ><PenNibOutline size="xl" /></Button
-    >
-  </div>
-
-  <div class="mt-3 flex items-center justify-center">
-    <div class="w-full text-center">
+  <!-- 페이지네이션 -->
+  <div class="mt-10 grid place-items-center">
+    <div class="text-center">
       {#if data.memoTotalCount > $currentTake}
-        <div>
-          <Button
-            class="mx-auto mt-10 w-1/2 rounded-none"
-            size="lg"
-            color="dark"
-            onclick={loadMoreData}>더 보기</Button
-          >
-        </div>
+        <Button class="w-full rounded-none" size="lg" color="dark" onclick={loadMoreData}
+          >더 보기</Button
+        >
       {/if}
 
       <div class="mt-2">
@@ -105,11 +96,18 @@
 
       {#if data.memoTotalCount <= $currentTake}
         <div class="mt-2">
-          <button class="underline" onclick={async () => await goto('#')}
-            >첫 번째 페이지로 이동</button
-          >
+          <button class="underline" onclick={async () => await goto('#')}>
+            첫 번째 페이지로 이동
+          </button>
         </div>
       {/if}
     </div>
+  </div>
+
+  <!-- 플로팅 -->
+  <div class="fixed bottom-12 right-5">
+    <Button size="sm" shadow onclick={() => handleModal('create')}>
+      <PenNibOutline size="xl" />
+    </Button>
   </div>
 </div>
