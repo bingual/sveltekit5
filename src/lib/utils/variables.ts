@@ -54,6 +54,7 @@ export const useLoadMore = () => {
   };
 
   return {
+    interval,
     currentTake,
     loadMoreData,
     unsubscribe,

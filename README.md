@@ -1,38 +1,77 @@
-# sv
+# Svelte5
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+## 소개
 
-## Creating a project
+**해당 프로젝트는** 최신 **Svelte 5**와 **SvelteKit**을 기반으로 구축된 프로젝트로, 클린 코드와 유지 보수를 중점적으로 고려한 웹 애플리케이션입니다.
 
-If you're seeing this, you've probably already done this step. Congrats!
+이 프로젝트는 성능 최적화, 재사용 가능한 컴포넌트&함수 설계, 모듈화, 메모리 누수 관리, 중복 제거, 테스트 코드 작성을 목표로 하여 효율적인 개발 환경을 구성하는데 초점을 맞춘 기능 테스트 프로젝트입니다.
 
-```bash
-# create a new project in the current directory
-npx sv create
+**Svelte 5**는 2024년 10월 19일 정식으로 릴리즈 되었습니다.
+한국에서는 **React**, **Vue**, **Next**와는 다르게 인지도가 매우 낮지만 빠르고 편리하며 프레임워크내에서 자체적으로 제공하는 기능이 많아 개발경험이 매우 좋기에 해외에서는 핫한 프레임워크 중 하나입니다.
 
-# create a new project in my-app
-npx sv create my-app
+현재 사용하는 svelte5 및 기타 라이브러리들은 베타 버전도 포함하고 있기에 버그가 있을 수 있습니다.
+
+---
+
+## 주요 기술 스택
+
+### **프론트엔드**
+
+- **Svelte 5**: 차세대 Svelte의 기능을 활용하여 더 나은 개발자 경험과 성능을 제공합니다.
+- **SvelteKit**: 애플리케이션 라우팅 및 빌드 도구로 사용합니다.
+
+### **스타일링**
+
+- **TailwindCSS**: 빠르고 유연한 유틸리티 기반 CSS 프레임워크.
+- **svelte5-ui-lib**: 기본 UI 컴포넌트를 빠르게 개발하기 위해 사용. (개발 진행 중인 베타 버전입니다.)
+
+### **백엔드 및 데이터 관리**
+
+- **Prisma**: ORM으로 데이터베이스 스키마 관리 및 상호작용을 효율화.
+- **@auth/sveltekit**: 인증 관리를 위한 모듈.
+- **Axios**: API 통신을 간단하고 직관적으로 구현.
+
+### **테스트 및 품질 관리**
+
+- **Vitest**: 유닛 테스트 및 통합 테스트 환경 제공.
+- **Playwright**: E2E 테스트를 통한 안정적인 애플리케이션 검증.
+- **Svelte Check**: 타입 및 구문 오류 검출.
+
+### **빌드 및 도구**
+
+- **Vite**: 빠른 개발 환경 및 빌드 도구.
+- **Prettier**: 코드 스타일 일관성 유지.
+- **ESLint**: 코드 품질 향상.
+
+---
+
+## 주요 기능
+
+1. **클린 코드**
+
+   - 중복 코드 제거.
+   - 재사용 가능한 컴포넌트 설계.
+   - 파일 및 모듈 구조를 체계적으로 구성.
+
+2. **스타일 통합**
+
+   - TailwindCSS와 `svelte5-ui-lib` 조합으로 직관적인 스타일 작성 및 유지 보수 가능.
+
+3. **메모리 누수 관리**
+
+   - Svelte의 반응형 데이터 및 클린업 메커니즘을 활용해 메모리 릭 방지.
+
+4. **테스트 우선**
+   - Vitest와 Playwright를 통한 전방위 테스트.
+
+---
+
+## 프로젝트 구조
+
+```plaintext
+src/
+├── lib/                   # 재사용 가능한 라이브러리 코드
+├── components/            # Svelte 컴포넌트
+├── routes/                # SvelteKit 라우팅
+└── utils/                 # 유틸리티 함수
 ```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.

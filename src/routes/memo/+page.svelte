@@ -8,13 +8,14 @@
   import { enhance } from '$app/forms';
   import { useLoadMore } from '$lib/utils/variables';
   import { goto } from '$app/navigation';
+  import { isEmpty } from 'remeda';
 
   const {
     modalStore: { setModal },
     toastStore: { addToast },
   } = useContext();
 
-  const { currentTake, loadMoreData, unsubscribe } = useLoadMore();
+  const { interval, currentTake, loadMoreData, unsubscribe } = useLoadMore();
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -82,27 +83,29 @@
   </div>
 
   <!-- 페이지네이션 -->
-  <div class="mt-10 grid place-items-center">
-    <div class="text-center">
-      {#if data.memoTotalCount > $currentTake}
-        <Button class="w-full rounded-none" size="lg" color="dark" onclick={loadMoreData}
-          >더 보기</Button
-        >
-      {/if}
+  {#if !isEmpty(data.memos) && data.memoTotalCount > interval}
+    <div class="mt-10 grid place-items-center">
+      <div class="text-center">
+        {#if data.memoTotalCount > $currentTake}
+          <Button class="w-full rounded-none" size="lg" color="dark" onclick={loadMoreData}
+            >더 보기</Button
+          >
+        {/if}
 
-      <div class="mt-2">
-        {`${data.memoTotalCount}개 목록 중 ${data.memos.length}개를 보셨습니다.`}
-      </div>
-
-      {#if data.memoTotalCount <= $currentTake}
         <div class="mt-2">
-          <button class="underline" onclick={async () => await goto('#')}>
-            첫 번째 페이지로 이동
-          </button>
+          {`${data.memoTotalCount}개 목록 중 ${data.memos.length}개를 보셨습니다.`}
         </div>
-      {/if}
+
+        {#if data.memoTotalCount <= $currentTake}
+          <div class="mt-2">
+            <button class="underline" onclick={async () => await goto('#')}>
+              첫 번째 페이지로 이동
+            </button>
+          </div>
+        {/if}
+      </div>
     </div>
-  </div>
+  {/if}
 
   <!-- 플로팅 -->
   <div class="fixed bottom-12 right-5">
