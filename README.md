@@ -69,17 +69,17 @@
 ## 프로젝트 구조
 
 ```plaintext
-prisma               # Prisma 관련 설정 및 파일
-e2e                  # E2E 테스트 코드
-src                  # 소스 코드 루트 폴더
-├── lib              # 재사용 가능한 라이브러리 코드
+prisma/               # Prisma 관련 설정 및 파일
+e2e/                  # E2E 테스트 코드
+src/                  # 소스 코드 루트 폴더
+├── lib/              # 재사용 가능한 라이브러리 코드
 │   ├── auth.ts      # Oauth 설정
 │   ├── prisma.ts    # Prisma 인스턴스 설정
-│   ├── utils        # 유틸리티 함수
-│   │   ├── mapping  # 매핑
-│   │   ├── stores   # 스토어
+│   ├── utils/        # 유틸리티 함수
+│   │   ├── mapping.ts  # 매핑
+│   │   ├── stores.ts   # 스토어
 │   │   └── variables.ts  # 기타 함수
 │   └── components/  # Svelte 컴포넌트
 ├── routes/          # SvelteKit 라우팅
-└── tests            # 유닛 테스트 코드
+└── tests/            # 유닛 테스트 코드
 ```
