@@ -11,11 +11,11 @@
   import SetImage from '$lib/components/modals/SetImage.svelte';
   import { type Writable, writable } from 'svelte/store';
   import clsx from 'clsx';
-
   import { getPublicUrl } from '$lib/utils/variables';
 
   const {
     modalStore: { modalState },
+    isLoading,
   } = useContext();
   const { modalUi, modalProps, modalTitle, modalButtonLabels } = modalState();
   const imageModalUi = uiHelpers();
@@ -30,6 +30,7 @@
   let filePreviews: Writable<FilePreview[]> = writable([]);
 
   const handleSubmit: SubmitFunction = () => {
+    isLoading.set(true);
     return async ({ result, update }) => {
       if (result.type === 'failure') {
         const validRes = result.data as ValidationResponse;
@@ -40,6 +41,7 @@
         await update();
         closeModal();
       }
+      isLoading.set(false);
     };
   };
 
@@ -97,7 +99,7 @@
       </div>
     </form>
 
-    {#if memoData}
+    {#if memoData?.images[0]?.url}
       <Label class="mb-2 mt-5 space-y-2"><span class="text-green-700">등록된 이미지</span></Label>
       <div class="grid grid-cols-8 gap-4">
         {#each memoData.images as images, index}

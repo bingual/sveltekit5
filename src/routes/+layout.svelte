@@ -6,13 +6,19 @@
   import Navbar from '$lib/components/layouts/Navbar.svelte';
   import Sidebar from '$lib/components/layouts/Sidebar.svelte';
   import Toast from '$lib/components/layouts/Toast.svelte';
-  import { modalStore, toastStore, useContext } from '$lib/utils/stores';
+  import { isLoading, modalStore, toastStore, useContext } from '$lib/utils/stores';
+  import Spinner from '$lib/components/layouts/Spinner.svelte';
 
   let { children } = $props();
   setContext('toastStore', toastStore());
   setContext('modalStore', modalStore());
+  setContext('isLoading', isLoading());
 
-  const { toastStore: ContextToastStore, modalStore: ContextModalStore } = useContext();
+  const {
+    toastStore: ContextToastStore,
+    modalStore: ContextModalStore,
+    isLoading: ContextIsLoading,
+  } = useContext();
   const { toasts } = ContextToastStore;
   const { modalState, resetModal } = ContextModalStore;
 
@@ -62,4 +68,8 @@
 
 {#if $toasts}
   <Toast />
+{/if}
+
+{#if $ContextIsLoading}
+  <Spinner />
 {/if}

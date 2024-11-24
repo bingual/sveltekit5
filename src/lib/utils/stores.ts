@@ -142,14 +142,19 @@ export const modalStore = () => {
   };
 };
 
+export const isLoading = () => writable(false);
+
 type ToastStore = ReturnType<typeof toastStore>;
 type ModalStore = ReturnType<typeof modalStore>;
+type IsLoading = ReturnType<typeof isLoading>;
 export const useContext = () => {
   const toastStore = getContext<ToastStore>('toastStore');
   const modalStore = getContext<ModalStore>('modalStore');
+  const isLoading = getContext<IsLoading>('isLoading');
 
   return {
     toastStore,
     modalStore,
+    isLoading,
   };
 };

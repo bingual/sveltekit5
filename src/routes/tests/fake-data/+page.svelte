@@ -7,15 +7,18 @@
 
   const {
     toastStore: { addToast },
+    isLoading,
   } = useContext();
 
   let { form }: { form: ActionData } = $props();
   let initCount = $state(1);
 
   const handleSubmit: SubmitFunction = () => {
+    isLoading.set(true);
     return async ({ update }) => {
       await update();
       initCount = 1;
+      isLoading.set(false);
     };
   };
 

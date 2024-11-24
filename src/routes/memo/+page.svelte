@@ -14,13 +14,14 @@
   const {
     modalStore: { setModal },
     toastStore: { addToast },
+    isLoading,
   } = useContext();
 
   const { interval, currentTake, loadMoreData, unsubscribe } = useLoadMore();
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
-  let isLoading = $state(false);
+  let isMemos = $state(false);
   let noDataMessage = $state();
 
   const items = [
@@ -50,13 +51,16 @@
     setModal('SetMemo', modalConfig.modalTitle, modalConfig.modalButtonLabels, modalConfig.props);
   };
 
-  const handleDelete: SubmitFunction = () => {
-    return async ({ update }) => {
-      const isConfirmed = confirm('정말로 삭제하시겠습니까?');
-      if (isConfirmed) {
+  const handleDelete: SubmitFunction = ({ cancel }) => {
+    if (confirm('정말 삭제하시겠습니까?')) {
+      isLoading.set(true);
+      return async ({ update }) => {
         await update();
-      }
-    };
+        isLoading.set(false);
+      };
+    } else {
+      cancel();
+    }
   };
 
   $effect(() => {
@@ -67,7 +71,7 @@
       addToast(toastMessage);
     }
 
-    isLoading = isEmpty(data.memos);
+    isMemos = isEmpty(data.memos);
     noDataMessage = generateNoDataMessage();
 
     return () => {
@@ -79,7 +83,7 @@
 <div class="mx-auto @container">
   <SearchBar {items} />
 
-  {#if !isLoading}
+  {#if !isMemos}
     <!-- 그리드 -->
     <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       {#each data.memos as memo}
