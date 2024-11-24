@@ -6,7 +6,7 @@
   import { EditOutline, TrashBinOutline, PenNibOutline } from 'flowbite-svelte-icons';
   import { actionMap } from '$lib/utils/mapping';
   import { enhance } from '$app/forms';
-  import { generateNoDataMessage, useLoadMore } from '$lib/utils/variables';
+  import { generateNoDataMessage, storageManager, useLoadMore } from '$lib/utils/variables';
   import { goto } from '$app/navigation';
   import { isEmpty } from 'remeda';
   import SearchBar from '$lib/components/SearchBar.svelte';
@@ -17,6 +17,7 @@
   } = useContext();
 
   const { interval, currentTake, loadMoreData, unsubscribe } = useLoadMore();
+  const { getPublicUrl } = storageManager();
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -61,8 +62,8 @@
 
   $effect(() => {
     if (form?.success) {
-      const title = `'${form.data.title}'`;
-      const action = actionMap(form.action).toastMessage;
+      const title = `'${form.data?.title}'`;
+      const action = actionMap(form.action).toastLabel;
       const toastMessage = `${title}을 ${action}하였습니다.`;
       addToast(toastMessage);
     }
@@ -78,11 +79,12 @@
 
 <div class="mx-auto @container">
   <SearchBar {items} />
+
   {#if !isLoading}
     <!-- 그리드 -->
     <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       {#each data.memos as memo}
-        <Card size="md" class="relative">
+        <Card class="relative" img={{ src: getPublicUrl(memo.images[0].url), alt: memo.title }}>
           <div class="prose pb-16 lg:prose-lg xl:prose-xl">
             <h3>{memo.title}</h3>
             <p>{memo.content}</p>
@@ -126,13 +128,13 @@
       </div>
     {/if}
   {:else}
-    <!-- 플로팅 -->
-    <div class="fixed bottom-12 right-5 z-50">
-      <Button size="sm" shadow onclick={() => handleModal('create')}>
-        <PenNibOutline size="xl" />
-      </Button>
-    </div>
-
     <Heading class="mb-2" tag="h5">{noDataMessage}</Heading>
   {/if}
+
+  <!-- 플로팅 -->
+  <div class="fixed bottom-12 right-5 z-50">
+    <Button size="sm" shadow onclick={() => handleModal('create')}>
+      <PenNibOutline size="xl" />
+    </Button>
+  </div>
 </div>

@@ -1,7 +1,10 @@
 import type { Actions, PageServerLoad } from './$types';
 import { prisma } from '$lib/prisma';
-import { FormDataSchema } from './schema';
+import { formDataSchema } from './schema';
 import { fail, redirect } from '@sveltejs/kit';
+import { storageManager } from '$lib/utils/variables';
+
+const { removePublicStorageFile, uploadPublicStorage } = storageManager();
 
 export const load: PageServerLoad = async ({ parent, url }) => {
   const { session } = await parent();
@@ -25,6 +28,11 @@ export const load: PageServerLoad = async ({ parent, url }) => {
         created_at: 'desc',
       },
       take,
+      include: {
+        images: {
+          select: { url: true },
+        },
+      },
     }),
     prisma.memo.count({
       where: {
@@ -39,7 +47,6 @@ export const load: PageServerLoad = async ({ parent, url }) => {
   };
 };
 
-// TODO: 다중 이미지 업로드 기능 구현
 export const actions = {
   create: async ({ locals, request }) => {
     return await handleAction(locals, request, 'create');
@@ -60,10 +67,25 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
       return redirect(302, '/');
     }
 
-    const formData = Object.fromEntries(await request.formData());
+    const formData = await request.formData();
+    const fromEntries = Object.fromEntries(formData);
+    const imageFiles = formData.getAll('images') as File[];
+
     if (actionType === 'delete') {
-      const formValidation = FormDataSchema.pick({ id: true }).safeParse(formData);
+      const formValidation = formDataSchema.pick({ id: true }).safeParse(fromEntries);
       if (formValidation.success) {
+        const memoImages = await prisma.memoImage.findMany({
+          where: {
+            memoId: formValidation.data?.id,
+            Memo: {
+              author: session?.user?.id,
+            },
+          },
+        });
+
+        const urlsToDelete = memoImages.map((image) => image.url);
+        await removePublicStorageFile(urlsToDelete);
+
         const res = await prisma.memo.delete({
           where: {
             author: session?.user?.id,
@@ -83,12 +105,17 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
           field: err.path[0],
           message: err.message,
         }));
-        return fail(400, { status: false, errors });
+        return fail(400, { success: false, errors });
       }
     } else {
-      const formValidation = FormDataSchema.safeParse(formData);
+      const formValidation = formDataSchema.safeParse(fromEntries);
+
       if (formValidation.success) {
         const { id, title, content } = formValidation.data;
+
+        const uploadResults = await Promise.all(
+          imageFiles.map((file) => uploadPublicStorage(file, '/images/memo')),
+        );
 
         if (actionType === 'create') {
           const res = await prisma.memo.create({
@@ -96,6 +123,11 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
               author: session?.user?.id,
               title: title,
               content: content,
+              images: {
+                create: uploadResults.map((url) => ({
+                  url,
+                })),
+              },
             },
           });
 
@@ -107,33 +139,58 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
             };
           }
         } else if (actionType === 'update') {
-          const res = await prisma.memo.update({
-            data: {
-              author: session?.user?.id,
-              title: title,
-              content: content,
-            },
+          const memoImages = await prisma.memoImage.findMany({
             where: {
-              author: session?.user?.id,
-              id: id,
+              memoId: formValidation.data?.id,
+              Memo: {
+                author: session?.user?.id,
+              },
             },
           });
 
-          if (res.id) {
+          const urlsToDelete = memoImages.map((image) => image.url);
+          await removePublicStorageFile(urlsToDelete);
+
+          const [updateResult, deleteManyResult, createManyResult] = await prisma.$transaction([
+            prisma.memo.update({
+              data: {
+                author: session?.user?.id,
+                title: title,
+                content: content,
+              },
+              where: {
+                author: session?.user?.id,
+                id: id,
+              },
+            }),
+            prisma.memoImage.deleteMany({
+              where: {
+                memoId: formValidation.data?.id,
+              },
+            }),
+            prisma.memoImage.createMany({
+              data: uploadResults.map((url) => ({
+                url,
+                memoId: id!,
+              })),
+            }),
+          ]);
+
+          if (updateResult.id) {
             return {
               success: true,
               action: 'update' as ActionType,
-              data: res,
+              data: updateResult,
             };
           }
         }
       } else {
-        const errors = formValidation.error.errors.map((err) => ({
+        const errors = formValidation.error?.errors.map((err) => ({
           field: err.path[0],
           message: err.message,
         }));
 
-        return fail(400, { status: false, errors });
+        return fail(400, { success: false, errors });
       }
     }
   } catch (err) {

@@ -1,15 +1,22 @@
 export const actionMap = (value: ActionType = 'create') => {
-  const toastMessageMap = {
+  const toastLabelMap = {
     create: '생성',
     update: '수정',
     delete: '삭제',
   };
 
+  const imageLabelMap = {
+    create: '등록',
+    update: '변경',
+  };
+
   const actionType = value || 'create';
-  const toastMessage = toastMessageMap[value] || '';
+  const toastLabel = toastLabelMap[value] || '';
+  const imageLabel = imageLabelMap[value] || '';
 
   return {
     actionType,
-    toastMessage,
+    toastLabel,
+    imageLabel,
   };
 };

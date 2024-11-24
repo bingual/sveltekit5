@@ -11,17 +11,22 @@ declare global {
 
   // interfaces
   interface ValidationError {
-    field: string;
+    field: string | number;
     message: string;
   }
 
   interface ValidationResponse {
-    status: boolean;
+    success: boolean;
     errors: ValidationError[];
   }
 
   // types
   type ActionType = 'create' | 'update' | 'delete';
+
+  type FilePreview = {
+    src: string;
+    alt: string;
+  };
 }
 
 export {};
