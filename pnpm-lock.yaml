@@ -178,8 +178,8 @@ importers:
         specifier: ^5.2.7
         version: 5.2.7
       svelte-5-ui-lib:
-        specifier: 0.11.2
-        version: 0.11.2(svelte@5.2.7)(tailwindcss@3.4.15)
+        specifier: 0.10.4
+        version: 0.10.4(@sveltejs/kit@2.8.2(@sveltejs/vite-plugin-svelte@4.0.1(svelte@5.2.7)(vite@5.4.11(@types/node@22.9.3)(sass@1.81.0)))(svelte@5.2.7)(vite@5.4.11(@types/node@22.9.3)(sass@1.81.0)))(svelte@5.2.7)(tailwindcss@3.4.15)
       svelte-check:
         specifier: ^4.1.0
         version: 4.1.0(picomatch@4.0.2)(svelte@5.2.7)(typescript@5.7.2)
@@ -3556,9 +3556,11 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  svelte-5-ui-lib@0.11.2:
-    resolution: {integrity: sha512-ngPJ3op3krsBqil+2Xp3zYJI31EjlBvCg2wTItkfHIX+S9/GIAxpTxXnPeTk877cGr0ypHHY+d0Qcnta59Cebg==}
+  svelte-5-ui-lib@0.10.4:
+    resolution: {integrity: sha512-RAjlndniJYt5wyL6F76v9f46PQ1F+t9RyhI2dV/SqSswj3Q6oi33xRsnKRgB654dEowKfofTw0M9wn77OpIMjQ==}
+    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
     peerDependencies:
+      '@sveltejs/kit': ^2.0.0
       svelte: ^5.0.0
       tailwindcss: ^3.0.0
 
@@ -3674,6 +3676,12 @@ packages:
 
   tailwind-merge@2.5.4:
     resolution: {integrity: sha512-0q8cfZHMu9nuYP/b5Shb7Y7Sh1B7Nnl5GqNr1U+n2p6+mybvRtayrQ+0042Z5byvTA8ihjlP8Odo8/VnHbZu4Q==}
+
+  tailwind-variants@0.2.1:
+    resolution: {integrity: sha512-2xmhAf4UIc3PijOUcJPA1LP4AbxhpcHuHM2C26xM0k81r0maAO6uoUSHl3APmvHZcY5cZCY/bYuJdfFa4eGoaw==}
+    engines: {node: '>=16.x', pnpm: '>=7.x'}
+    peerDependencies:
+      tailwindcss: '*'
 
   tailwindcss@3.4.15:
     resolution: {integrity: sha512-r4MeXnfBmSOuKUWmXe6h2CcyfzJCEk4F0pptO5jlnYSIViUkVmsawj80N5h2lO3gwcmSb4n3PuN+e+GC1Guylw==}
@@ -7315,13 +7323,16 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte-5-ui-lib@0.11.2(svelte@5.2.7)(tailwindcss@3.4.15):
+  svelte-5-ui-lib@0.10.4(@sveltejs/kit@2.8.2(@sveltejs/vite-plugin-svelte@4.0.1(svelte@5.2.7)(vite@5.4.11(@types/node@22.9.3)(sass@1.81.0)))(svelte@5.2.7)(vite@5.4.11(@types/node@22.9.3)(sass@1.81.0)))(svelte@5.2.7)(tailwindcss@3.4.15):
     dependencies:
       '@floating-ui/dom': 1.6.12
+      '@sveltejs/kit': 2.8.2(@sveltejs/vite-plugin-svelte@4.0.1(svelte@5.2.7)(vite@5.4.11(@types/node@22.9.3)(sass@1.81.0)))(svelte@5.2.7)(vite@5.4.11(@types/node@22.9.3)(sass@1.81.0))
       apexcharts: 3.54.1
       clsx: 2.1.1
+      flowbite-svelte-icons: 2.0.2(svelte@5.2.7)(tailwind-merge@2.5.4)(tailwindcss@3.4.15)
       svelte: 5.2.7
       tailwind-merge: 2.5.4
+      tailwind-variants: 0.2.1(tailwindcss@3.4.15)
       tailwindcss: 3.4.15
 
   svelte-ast-print@0.4.2(svelte@5.2.7):
@@ -7433,6 +7444,11 @@ snapshots:
       svg.js: 2.7.1
 
   tailwind-merge@2.5.4: {}
+
+  tailwind-variants@0.2.1(tailwindcss@3.4.15):
+    dependencies:
+      tailwind-merge: 2.5.4
+      tailwindcss: 3.4.15
 
   tailwindcss@3.4.15:
     dependencies:

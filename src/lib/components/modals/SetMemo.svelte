@@ -61,6 +61,7 @@
 </script>
 
 <!-- FIXME: 현재 svelte-5-ui-lib 베타버전 모달은 X축 반응형 동작에 버그있음. 모바일 환경에서 치명적임-->
+<!-- TODO: MarkDown Editor 로 변경할 예정 -->
 <Modal title={$modalTitle} {modalStatus} {closeModal}>
   <div class="overflow-x-auto">
     {#if !isEmpty(errors)}
