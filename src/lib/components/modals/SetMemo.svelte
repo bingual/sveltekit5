@@ -10,16 +10,14 @@
   import Alert from '$lib/components/Alert.svelte';
   import SetImage from '$lib/components/modals/SetImage.svelte';
   import { type Writable, writable } from 'svelte/store';
-  import { storageManager } from '$lib/utils/variables';
   import clsx from 'clsx';
+
+  import { getPublicUrl } from '$lib/utils/variables';
 
   const {
     modalStore: { modalState },
   } = useContext();
   const { modalUi, modalProps, modalTitle, modalButtonLabels } = modalState();
-
-  const { getPublicUrl } = storageManager();
-
   const imageModalUi = uiHelpers();
   const closeModal = modalUi.close;
 

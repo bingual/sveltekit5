@@ -6,7 +6,7 @@
   import { EditOutline, TrashBinOutline, PenNibOutline } from 'flowbite-svelte-icons';
   import { actionMap } from '$lib/utils/mapping';
   import { enhance } from '$app/forms';
-  import { generateNoDataMessage, storageManager, useLoadMore } from '$lib/utils/variables';
+  import { generateNoDataMessage, getPublicUrl, useLoadMore } from '$lib/utils/variables';
   import { goto } from '$app/navigation';
   import { isEmpty } from 'remeda';
   import SearchBar from '$lib/components/SearchBar.svelte';
@@ -17,7 +17,6 @@
   } = useContext();
 
   const { interval, currentTake, loadMoreData, unsubscribe } = useLoadMore();
-  const { getPublicUrl } = storageManager();
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -84,7 +83,12 @@
     <!-- 그리드 -->
     <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       {#each data.memos as memo}
-        <Card class="relative" img={{ src: getPublicUrl(memo.images[0].url), alt: memo.title }}>
+        <Card
+          class="relative"
+          img={memo?.images[0]?.url
+            ? { src: getPublicUrl(memo?.images[0]?.url), alt: memo.title }
+            : undefined}
+        >
           <div class="prose pb-16 lg:prose-lg xl:prose-xl">
             <h3>{memo.title}</h3>
             <p>{memo.content}</p>

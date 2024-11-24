@@ -2,7 +2,8 @@ import type { Actions, PageServerLoad } from './$types';
 import { prisma } from '$lib/prisma';
 import { formDataSchema } from './schema';
 import { fail, redirect } from '@sveltejs/kit';
-import { storageManager } from '$lib/utils/variables';
+import { storageManager } from '$lib/utils/variables.server';
+import { isEmpty } from 'remeda';
 
 const { removePublicStorageFile, uploadPublicStorage } = storageManager();
 
@@ -84,7 +85,9 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
         });
 
         const urlsToDelete = memoImages.map((image) => image.url);
-        await removePublicStorageFile(urlsToDelete);
+        if (!isEmpty(urlsToDelete)) {
+          await removePublicStorageFile(urlsToDelete);
+        }
 
         const res = await prisma.memo.delete({
           where: {
@@ -113,9 +116,10 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
       if (formValidation.success) {
         const { id, title, content } = formValidation.data;
 
-        const uploadResults = await Promise.all(
-          imageFiles.map((file) => uploadPublicStorage(file, '/images/memo')),
-        );
+        const validImageFiles = imageFiles.filter((file) => file.size > 0 && file.name !== '');
+        const uploadResults = !isEmpty(validImageFiles)
+          ? await Promise.all(imageFiles.map((file) => uploadPublicStorage(file, '/images/memo')))
+          : [];
 
         if (actionType === 'create') {
           const res = await prisma.memo.create({
@@ -149,7 +153,9 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
           });
 
           const urlsToDelete = memoImages.map((image) => image.url);
-          await removePublicStorageFile(urlsToDelete);
+          if (!isEmpty(urlsToDelete)) {
+            await removePublicStorageFile(urlsToDelete);
+          }
 
           const [updateResult, deleteManyResult, createManyResult] = await prisma.$transaction([
             prisma.memo.update({
@@ -168,12 +174,16 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
                 memoId: formValidation.data?.id,
               },
             }),
-            prisma.memoImage.createMany({
-              data: uploadResults.map((url) => ({
-                url,
-                memoId: id!,
-              })),
-            }),
+            ...(!isEmpty(uploadResults)
+              ? [
+                  prisma.memoImage.createMany({
+                    data: uploadResults.map((url) => ({
+                      url,
+                      memoId: id!,
+                    })),
+                  }),
+                ]
+              : []),
           ]);
 
           if (updateResult.id) {
