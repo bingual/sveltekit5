@@ -9,6 +9,7 @@
   } from 'svelte-5-ui-lib';
   import { ChartOutline, PenNibOutline, LightbulbOutline, CogOutline } from 'flowbite-svelte-icons';
   import { page } from '$app/stores';
+  import { dev } from '$app/environment';
 
   const userInfo = $derived($page.data.session?.user);
 
@@ -52,7 +53,7 @@
     {
       options: [{ border: true }],
       items: [
-        ...(userInfo
+        ...(dev && userInfo
           ? [
               {
                 label: '테스트',

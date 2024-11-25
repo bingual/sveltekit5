@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { filter } from 'remeda';
 
 const validImageTypes = ['image/jpg', 'image/jpeg', 'image/png'];
 
@@ -21,7 +22,7 @@ export const imageFilesSchema = z
         message: '파일은 최대 8개까지 업로드할 수 있습니다.',
       });
     }
-    const invalidFiles = files.filter((file) => !validImageTypes.includes(file.type));
+    const invalidFiles = filter(files, (file) => !validImageTypes.includes(file.type));
     if (invalidFiles.length > 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

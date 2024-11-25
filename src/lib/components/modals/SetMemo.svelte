@@ -105,7 +105,7 @@
         {#each memoData.images as images, index}
           <Img
             imgClass="object-cover w-24 h-24"
-            src={getPublicUrl(images.url)}
+            src={images.url.startsWith('https://') ? images.url : getPublicUrl(images.url)}
             alt={String(index)}
             shadow="md"
           />

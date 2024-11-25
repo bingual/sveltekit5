@@ -10,7 +10,7 @@ export const storageManager = () => {
 
   const imageOptimizer = async (file: File) => {
     const inputBuffer = Buffer.from(await file.arrayBuffer());
-    return await sharp(inputBuffer).resize(250).webp({ quality: 80 }).toBuffer();
+    return await sharp(inputBuffer).resize(400, 400).webp({ quality: 80 }).toBuffer();
   };
 
   const uploadPublicStorage = async (file: File, dir: string) => {

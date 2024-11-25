@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button, Fileupload, Helper, Img, Modal, type uiHelpers } from 'svelte-5-ui-lib';
-  import { isEmpty } from 'remeda';
+  import { isEmpty, map } from 'remeda';
   import type { Writable } from 'svelte/store';
   import { useContext } from '$lib/utils/stores';
   import { imageFilesSchema } from '$lib/utils/schema';
@@ -35,14 +35,17 @@
 
   let selectedFiles = $state<FileList | undefined>();
   let filePreviews: FilePreview[] = $state([]);
-  let isValid = $state(false);
+  let isValid = $state(true);
   let helperMessage = $state('지원 확장자: jpg, jpeg, png / 최대 크기: 50MB');
 
   const handleConfirm = () => {
     if (isValid) {
       parentSelectedFiles.set(selectedFiles);
       parentFilePreviews.set(filePreviews);
-      addToast('임시 이미지를 등록하였습니다.');
+
+      if (selectedFiles) {
+        addToast('임시 이미지를 등록하였습니다.');
+      }
       closeModal();
     }
   };
@@ -56,18 +59,19 @@
       if (imageValidation.success) {
         isValid = true;
         filePreviews = selectedFiles
-          ? Array.from(selectedFiles).map((file) => ({
+          ? map(Array.from(selectedFiles), (file) => ({
               src: URL.createObjectURL(file),
               alt: file.name,
             }))
           : [];
-        errors = [];
       } else {
         isValid = false;
-        errors = imageValidation.error?.errors.map((err) => ({
-          field: err.path[0],
-          message: err.message,
-        }));
+        errors = imageValidation.error?.errors
+          ? map(imageValidation.error.errors, (err) => ({
+              field: err.path[0],
+              message: err.message,
+            }))
+          : [];
       }
     }
 

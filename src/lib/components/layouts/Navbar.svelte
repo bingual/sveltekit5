@@ -18,6 +18,7 @@
   import { sineIn } from 'svelte/easing';
   import { page } from '$app/stores';
   import { SignIn, SignOut } from '@auth/sveltekit/components';
+  import { dev } from '$app/environment';
 
   const userInfo = $derived($page.data.session?.user);
 
@@ -115,11 +116,13 @@
       <NavLi href="/">대쉬보드</NavLi>
       {#if userInfo}
         <NavLi href="/memo">메모</NavLi>
-        <NavLi class="cursor-pointer" onclick={dropdown.toggle}
-          >테스트<ChevronDownOutline
-            class="ms-2 inline h-6 w-6 text-primary-800 dark:text-white"
-          /></NavLi
-        >
+        {#if dev}
+          <NavLi class="cursor-pointer" onclick={dropdown.toggle}
+            >테스트<ChevronDownOutline
+              class="ms-2 inline h-6 w-6 text-primary-800 dark:text-white"
+            /></NavLi
+          >
+        {/if}
         <div class="relative">
           <Dropdown
             {dropdownStatus}

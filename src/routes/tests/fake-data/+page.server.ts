@@ -14,6 +14,7 @@ export const actions = {
     const { count } = formData;
 
     const totalCount = Number(count) || 1;
+    const imageCount = faker.number.int({ min: 1, max: 8 });
     const now = new Date();
 
     const fakeMemos = Array.from({ length: totalCount }, (_, index) => ({
@@ -23,15 +24,35 @@ export const actions = {
       created_at: new Date(now.getTime() - index * 1000),
     }));
 
-    const res = await prisma.memo.createMany({
-      data: fakeMemos,
+    const [createdMemosCount] = await prisma.$transaction(async (prisma) => {
+      const createdMemosCount = await prisma.memo.createMany({
+        data: fakeMemos,
+        skipDuplicates: true,
+      });
+
+      const createdMemos = await prisma.memo.findMany({
+        where: { author: session?.user?.id },
+        orderBy: { created_at: 'desc' },
+        take: totalCount,
+      });
+
+      const fakeImages = createdMemos.flatMap((memo) =>
+        Array.from({ length: imageCount }, () => ({
+          memoId: memo.id,
+          url: faker.image.url({ width: 400, height: 400 }),
+        })),
+      );
+
+      const fakeImagesCount = await prisma.memoImage.createMany({ data: fakeImages });
+
+      return [createdMemosCount, createdMemos, fakeImagesCount];
     });
 
-    if (res) {
+    if (createdMemosCount.count > 0) {
       return {
         success: true,
         action: 'create' as ActionType,
-        data: res,
+        data: createdMemosCount,
       };
     }
   },

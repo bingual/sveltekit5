@@ -2,6 +2,7 @@ import { get, type Writable, writable } from 'svelte/store';
 import { localStorageManager } from '$lib/utils/variables.js';
 import { getContext } from 'svelte';
 import { uiHelpers } from 'svelte-5-ui-lib';
+import { filter, map } from 'remeda';
 
 const persistentStore = (key: string, startValue: any) => {
   const { loadFromLocalStorage, saveToLocalStorage } = localStorageManager();
@@ -35,7 +36,7 @@ export const toastStore = () => {
   const decrementCounter = (id: number) => {
     const interval = setInterval(() => {
       toasts?.update((toasts) => {
-        return toasts.map((toast) => {
+        return map(toasts, (toast) => {
           if (toast.id === id) {
             if (toast.counter <= 1) {
               clearInterval(interval);
@@ -59,7 +60,7 @@ export const toastStore = () => {
   };
 
   const removeToast = (id: number) => {
-    toasts?.update((toasts) => toasts.filter((toast) => toast.id !== id));
+    toasts?.update((toasts) => filter(toasts, (toast) => toast.id !== id));
   };
 
   restoreCounters();

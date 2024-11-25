@@ -3,7 +3,7 @@ import { prisma } from '$lib/prisma';
 import { formDataSchema } from './schema';
 import { fail, redirect } from '@sveltejs/kit';
 import { storageManager } from '$lib/utils/variables.server';
-import { isEmpty } from 'remeda';
+import { filter, isEmpty, map } from 'remeda';
 
 const { removePublicStorageFile, uploadPublicStorage } = storageManager();
 
@@ -84,27 +84,27 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
           },
         });
 
-        const urlsToDelete = memoImages.map((image) => image.url);
+        const urlsToDelete = map(memoImages, (image) => image.url);
         if (!isEmpty(urlsToDelete)) {
           await removePublicStorageFile(urlsToDelete);
         }
 
-        const res = await prisma.memo.delete({
+        const deletedMemo = await prisma.memo.delete({
           where: {
             author: session?.user?.id,
             id: formValidation.data?.id,
           },
         });
 
-        if (res.id) {
+        if (deletedMemo.id) {
           return {
             success: true,
             action: 'delete' as ActionType,
-            data: res,
+            data: deletedMemo,
           };
         }
       } else {
-        const errors = formValidation.error.errors.map((err) => ({
+        const errors = map(formValidation.error?.errors, (err) => ({
           field: err.path[0],
           message: err.message,
         }));
@@ -116,30 +116,30 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
       if (formValidation.success) {
         const { id, title, content } = formValidation.data;
 
-        const validImageFiles = imageFiles.filter((file) => file.size > 0 && file.name !== '');
+        const validImageFiles = filter(imageFiles, (file) => file.size > 0 && file.name !== '');
         const uploadResults = !isEmpty(validImageFiles)
-          ? await Promise.all(imageFiles.map((file) => uploadPublicStorage(file, '/images/memo')))
+          ? await Promise.all(map(imageFiles, (file) => uploadPublicStorage(file, '/images/memo')))
           : [];
 
         if (actionType === 'create') {
-          const res = await prisma.memo.create({
+          const createdMemo = await prisma.memo.create({
             data: {
               author: session?.user?.id,
               title: title,
               content: content,
               images: {
-                create: uploadResults.map((url) => ({
+                create: map(uploadResults, (url) => ({
                   url,
                 })),
               },
             },
           });
 
-          if (res.id) {
+          if (createdMemo.id) {
             return {
               success: true,
               action: 'create' as ActionType,
-              data: res,
+              data: createdMemo,
             };
           }
         } else if (actionType === 'update') {
@@ -152,13 +152,13 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
             },
           });
 
-          const urlsToDelete = memoImages.map((image) => image.url);
+          const urlsToDelete = map(memoImages, (image) => image.url);
           if (!isEmpty(urlsToDelete)) {
             await removePublicStorageFile(urlsToDelete);
           }
 
-          const [updateResult, deleteManyResult, createManyResult] = await prisma.$transaction([
-            prisma.memo.update({
+          const [updatedMemo] = await prisma.$transaction(async (prisma) => {
+            const updatedMemo = await prisma.memo.update({
               data: {
                 author: session?.user?.id,
                 title: title,
@@ -168,37 +168,41 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
                 author: session?.user?.id,
                 id: id,
               },
-            }),
-            prisma.memoImage.deleteMany({
+            });
+
+            const deletedMemoImagesCount = await prisma.memoImage.deleteMany({
               where: {
                 memoId: formValidation.data?.id,
               },
-            }),
-            ...(!isEmpty(uploadResults)
-              ? [
-                  prisma.memoImage.createMany({
-                    data: uploadResults.map((url) => ({
-                      url,
-                      memoId: id!,
-                    })),
-                  }),
-                ]
-              : []),
-          ]);
+            });
 
-          if (updateResult.id) {
+            const createdMemoImagesCount =
+              !isEmpty(uploadResults) &&
+              (await prisma.memoImage.createMany({
+                data: map(uploadResults, (url) => ({
+                  url,
+                  memoId: id!,
+                })),
+              }));
+
+            return [updatedMemo, deletedMemoImagesCount, createdMemoImagesCount];
+          });
+
+          if (updatedMemo.id) {
             return {
               success: true,
               action: 'update' as ActionType,
-              data: updateResult,
+              data: updatedMemo,
             };
           }
         }
       } else {
-        const errors = formValidation.error?.errors.map((err) => ({
-          field: err.path[0],
-          message: err.message,
-        }));
+        const errors = formValidation.error?.errors
+          ? map(formValidation.error.errors, (err) => ({
+              field: err.path[0],
+              message: err.message,
+            }))
+          : [];
 
         return fail(400, { success: false, errors });
       }

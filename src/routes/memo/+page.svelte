@@ -90,8 +90,16 @@
         <Card
           class="relative"
           img={memo?.images[0]?.url
-            ? { src: getPublicUrl(memo?.images[0]?.url), alt: memo.title }
-            : undefined}
+            ? {
+                src: memo.images[0].url.startsWith('https://')
+                  ? memo.images[0].url
+                  : getPublicUrl(memo.images[0].url),
+                alt: memo.title,
+              }
+            : {
+                src: '/images/noImage.jpg',
+                alt: memo.title,
+              }}
         >
           <div class="prose pb-16 lg:prose-lg xl:prose-xl">
             <h3>{memo.title}</h3>
