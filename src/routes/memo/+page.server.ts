@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ parent, url }) => {
   const { session } = await parent();
 
   const searchParams = url.searchParams;
-  const take = Number(searchParams.get('take')) || 10;
+  const take = Number(searchParams.get('take')) || 20;
   const category = searchParams.get('category') || 'all';
   const query = searchParams.get('query') || '';
 

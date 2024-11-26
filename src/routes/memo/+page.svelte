@@ -89,6 +89,7 @@
       {#each data.memos as memo}
         <Card
           class="relative"
+          size="md"
           img={memo?.images[0]?.url
             ? {
                 src: memo.images[0].url.startsWith('https://')

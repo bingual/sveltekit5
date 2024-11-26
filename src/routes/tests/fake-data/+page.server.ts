@@ -1,6 +1,8 @@
 import { redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/prisma';
 import { faker } from '@faker-js/faker/locale/en';
+import { isEmpty, map } from 'remeda';
+import { storageManager } from '$lib/utils/variables.server';
 
 export const actions = {
   memoCreate: async ({ locals, request }) => {
@@ -33,7 +35,7 @@ export const actions = {
       const createdMemos = await prisma.memo.findMany({
         where: { author: session?.user?.id },
         orderBy: { created_at: 'desc' },
-        take: totalCount,
+        take: createdMemosCount.count,
       });
 
       const fakeImages = createdMemos.flatMap((memo) =>
@@ -62,18 +64,32 @@ export const actions = {
     if (!session?.user?.id) {
       return redirect(302, '/');
     }
+    const memoImages = await prisma.memoImage.findMany({
+      where: {
+        Memo: {
+          author: session?.user?.id,
+        },
+      },
+    });
 
-    const res = await prisma.memo.deleteMany({
+    const { removePublicStorageFile } = storageManager();
+
+    const urlsToDelete = map(memoImages, (image) => image.url);
+    if (!isEmpty(urlsToDelete)) {
+      await removePublicStorageFile(urlsToDelete);
+    }
+
+    const memoDeleted = await prisma.memo.deleteMany({
       where: {
         author: session?.user?.id,
       },
     });
 
-    if (res) {
+    if (memoDeleted.count > 0) {
       return {
         success: true,
         action: 'delete' as ActionType,
-        data: res,
+        data: memoDeleted,
       };
     }
   },

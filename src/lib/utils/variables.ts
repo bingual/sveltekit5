@@ -37,7 +37,7 @@ export const localStorageManager = () => {
 
 export const useLoadMore = () => {
   const key = 'take';
-  const interval = 10;
+  const interval = 20;
   const url = get(page).url;
   const currentTake = writable(interval);
 
