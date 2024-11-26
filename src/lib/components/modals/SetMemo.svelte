@@ -65,7 +65,7 @@
 <!-- FIXME: 현재 svelte-5-ui-lib 베타버전 모달은 X축 반응형 동작에 버그있음. 모바일 환경에서 치명적임-->
 <!-- TODO: MarkDown Editor 로 변경할 예정 -->
 <Modal title={$modalTitle} {modalStatus} {closeModal}>
-  <div class="overflow-x-auto">
+  <div class="max-h-[70vh] overflow-hidden overflow-y-auto">
     {#if !isEmpty(errors)}
       <Alert {errors} />
     {/if}
@@ -91,7 +91,7 @@
             class="mt-2 resize-none"
             id="content"
             name="content"
-            rows={5}
+            rows={15}
             value={memoData?.content}
             required
           />
@@ -101,7 +101,7 @@
 
     {#if memoData?.images[0]?.url}
       <Label class="mb-2 mt-5 space-y-2"><span class="text-green-700">등록된 이미지</span></Label>
-      <div class="grid grid-cols-8 gap-4">
+      <div class="grid grid-cols-4 gap-4 sm:grid-cols-8">
         {#each memoData.images as images, index}
           <Img
             imgClass="object-cover w-24 h-24"
@@ -119,7 +119,7 @@
           >{actionMap($modalProps?.action).imageLabel}할 이미지</span
         ></Label
       >
-      <div class="grid grid-cols-8 gap-4">
+      <div class="grid grid-cols-4 gap-4 sm:grid-cols-8">
         {#each $filePreviews as { src, alt }}
           <Img imgClass="object-cover w-24 h-24" {src} {alt} shadow="md" />
         {/each}

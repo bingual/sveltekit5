@@ -13,6 +13,7 @@
     Avatar,
     DropdownFooter,
     Button,
+    Img,
   } from 'svelte-5-ui-lib';
   import { ChevronDownOutline } from 'flowbite-svelte-icons';
   import { sineIn } from 'svelte/easing';
@@ -46,7 +47,9 @@
 <div>
   <Navbar {fluid} {navStatus} hamburgerMenu={false}>
     {#snippet brand()}
-      <NavBrand siteName="Adora"></NavBrand>
+      <NavBrand siteName="Adora">
+        <Img width="40" src="/images/Adora.png" alt="svelte icon" />
+      </NavBrand>
     {/snippet}
 
     {#snippet navSlotBlock()}

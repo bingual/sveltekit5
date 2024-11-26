@@ -16,7 +16,6 @@ export const actions = {
     const { count } = formData;
 
     const totalCount = Number(count) || 1;
-    const imageCount = faker.number.int({ min: 1, max: 8 });
     const now = new Date();
 
     const fakeMemos = Array.from({ length: totalCount }, (_, index) => ({
@@ -38,12 +37,13 @@ export const actions = {
         take: createdMemosCount.count,
       });
 
-      const fakeImages = createdMemos.flatMap((memo) =>
-        Array.from({ length: imageCount }, () => ({
+      const fakeImages = createdMemos.flatMap((memo) => {
+        const imageCount = faker.number.int({ min: 1, max: 8 });
+        return Array.from({ length: imageCount }, () => ({
           memoId: memo.id,
           url: faker.image.url({ width: 400, height: 400 }),
-        })),
-      );
+        }));
+      });
 
       const fakeImagesCount = await prisma.memoImage.createMany({ data: fakeImages });
 
