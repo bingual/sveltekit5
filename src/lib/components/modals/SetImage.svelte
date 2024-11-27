@@ -97,6 +97,7 @@
       {#each filePreviews as { src, alt }}
         <Img
           imgClass="w-24 h-24 object-cover"
+          captionClass="line-clamp-2"
           {src}
           {alt}
           caption={alt}

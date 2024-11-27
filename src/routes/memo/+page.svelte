@@ -103,8 +103,8 @@
               }}
         >
           <div class="prose pb-16 lg:prose-lg xl:prose-xl">
-            <h3>{memo.title}</h3>
-            <p>{memo.content}</p>
+            <h3 class="line-clamp-2">{memo.title}</h3>
+            <p class="line-clamp-4">{memo.content}</p>
           </div>
 
           <div class="absolute bottom-3 left-3 flex gap-x-2 p-3">
