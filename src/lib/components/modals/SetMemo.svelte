@@ -99,31 +99,40 @@
       </div>
     </form>
 
-    {#if memoData?.images[0]?.url}
-      <Label class="mb-2 mt-5 space-y-2"><span class="text-green-700">등록된 이미지</span></Label>
+    <!-- 스니펫에서는 현재 타입 지정 불가능 (정확히는 IDE에서 오류나고 적용 한다해도 유지보수 매우 불편해짐)  -->
+    {#snippet imageSection(labelClass, label, images, filePreviews)}
+      <Label class="mb-2 mt-5 space-y-2"><span class={labelClass}>{label}</span></Label>
       <div class="grid grid-cols-4 gap-4 sm:grid-cols-8">
-        {#each memoData.images as images, index}
-          <Img
-            imgClass="object-cover w-24 h-24"
-            src={images.url.startsWith('https://') ? images.url : getPublicUrl(images.url)}
-            alt={String(index)}
-            shadow="md"
-          />
-        {/each}
+        {#if images}
+          {#each images as { url }, index}
+            <Img
+              imgClass="object-cover w-24 h-24"
+              src={url.startsWith('https://') ? url : getPublicUrl(url)}
+              alt={String(index)}
+              shadow="md"
+            />
+          {/each}
+        {/if}
+
+        {#if filePreviews}
+          {#each filePreviews as { src, alt }}
+            <Img imgClass="object-cover w-24 h-24" {src} {alt} shadow="md" />
+          {/each}
+        {/if}
       </div>
+    {/snippet}
+
+    {#if memoData?.images[0]?.url}
+      {@render imageSection('text-green-700', '등록된 이미지', memoData?.images, undefined)}
     {/if}
 
     {#if !isEmpty($filePreviews)}
-      <Label class="mb-2 mt-5 space-y-2"
-        ><span class={clsx(memoData ? 'text-red-700' : 'text-green-700')}
-          >{actionMap($modalProps?.action).imageLabel}할 이미지</span
-        ></Label
-      >
-      <div class="grid grid-cols-4 gap-4 sm:grid-cols-8">
-        {#each $filePreviews as { src, alt }}
-          <Img imgClass="object-cover w-24 h-24" {src} {alt} shadow="md" />
-        {/each}
-      </div>
+      {@render imageSection(
+        clsx(memoData ? 'text-red-700' : 'text-green-700'),
+        `${actionMap($modalProps?.action).imageLabel}할 이미지`,
+        undefined,
+        $filePreviews,
+      )}
     {/if}
 
     <div class="mt-5 flex items-center justify-between">
