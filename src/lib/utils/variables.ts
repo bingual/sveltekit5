@@ -4,6 +4,7 @@ import { page } from '$app/stores';
 import { get, writable } from 'svelte/store';
 import { supabase } from '$lib/supabaseClient';
 import { PUBLIC_SUPABASE_BUCKET } from '$env/static/public';
+import { onDestroy } from 'svelte';
 
 export const localStorageManager = () => {
   if (!browser) {
@@ -55,11 +56,12 @@ export const useLoadMore = () => {
     await goto(url.toString(), { replaceState: true, noScroll: true });
   };
 
+  onDestroy(() => unsubscribe());
+
   return {
     interval,
     currentTake,
     loadMoreData,
-    unsubscribe,
   };
 };
 

@@ -2,7 +2,7 @@ import { get, type Writable, writable } from 'svelte/store';
 import { localStorageManager } from '$lib/utils/variables.js';
 import { getContext } from 'svelte';
 import { uiHelpers } from 'svelte-5-ui-lib';
-import { filter, map } from 'remeda';
+import { filter, forEach, map } from 'remeda';
 
 const persistentStore = (key: string, startValue: any) => {
   const { loadFromLocalStorage, saveToLocalStorage } = localStorageManager();
@@ -52,7 +52,8 @@ export const toastStore = () => {
 
   const restoreCounters = () => {
     const currentToasts = get(toasts);
-    currentToasts.forEach((toast) => {
+
+    forEach(currentToasts, (toast) => {
       if (toast.status && toast.counter > 0) {
         decrementCounter(toast.id);
       }
@@ -77,9 +78,9 @@ export const modalStore = () => {
     SetMemo: 'SetMemo',
   } as const;
 
-  type ModalNameType = (typeof modalNames)[keyof typeof modalNames] | '';
-  type DefaultValueType = {
-    currentModalName: ModalNameType;
+  type ModalName = (typeof modalNames)[keyof typeof modalNames] | '';
+  type DefaultState = {
+    currentModalName: ModalName;
     modalTitle: string;
     modalButtonLabels: {
       confirm?: string;
@@ -88,19 +89,19 @@ export const modalStore = () => {
     modalProps?: { data?: any; action?: ActionType };
   };
 
-  const defaultValue: DefaultValueType = {
+  const defaultState: DefaultState = {
     currentModalName: '',
     modalTitle: '',
     modalButtonLabels: { confirm: '확인', cancel: '취소' },
     modalProps: undefined,
   };
 
-  const currentModalName = writable(defaultValue.currentModalName);
+  const currentModalName = writable(defaultState.currentModalName);
 
   const modalUi = uiHelpers();
-  const modalTitle = writable(defaultValue.modalTitle);
-  const modalButtonLabels = writable(defaultValue.modalButtonLabels);
-  const modalProps = writable<DefaultValueType['modalProps']>(defaultValue.modalProps);
+  const modalTitle = writable(defaultState.modalTitle);
+  const modalButtonLabels = writable(defaultState.modalButtonLabels);
+  const modalProps = writable<DefaultState['modalProps']>(defaultState.modalProps);
 
   const modalState = () => {
     return {
@@ -115,9 +116,9 @@ export const modalStore = () => {
   };
 
   const setModal = (
-    name: DefaultValueType['currentModalName'],
-    title?: DefaultValueType['modalTitle'],
-    buttons?: DefaultValueType['modalButtonLabels'],
+    name: DefaultState['currentModalName'],
+    title?: DefaultState['modalTitle'],
+    buttons?: DefaultState['modalButtonLabels'],
     props?: any,
   ) => {
     currentModalName.set(name);
@@ -129,11 +130,11 @@ export const modalStore = () => {
   };
 
   const resetModal = () => {
-    currentModalName.set(defaultValue.currentModalName);
+    currentModalName.set(defaultState.currentModalName);
 
-    modalTitle.set(defaultValue.modalTitle);
-    modalButtonLabels.set(defaultValue.modalButtonLabels);
-    modalProps.set(defaultValue.modalProps);
+    modalTitle.set(defaultState.modalTitle);
+    modalButtonLabels.set(defaultState.modalButtonLabels);
+    modalProps.set(defaultState.modalProps);
   };
 
   return {

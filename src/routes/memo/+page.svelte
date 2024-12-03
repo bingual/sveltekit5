@@ -17,7 +17,7 @@
     isLoading,
   } = useContext();
 
-  const { interval, currentTake, loadMoreData, unsubscribe } = useLoadMore();
+  const { interval, currentTake, loadMoreData } = useLoadMore();
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -73,10 +73,6 @@
 
     isMemos = isEmpty(data.memos);
     noDataMessage = generateNoDataMessage();
-
-    return () => {
-      unsubscribe();
-    };
   });
 </script>
 

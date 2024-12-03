@@ -6,7 +6,7 @@
   import { useContext } from '$lib/utils/stores';
   import { actionMap } from '$lib/utils/mapping';
   import { enhance } from '$app/forms';
-  import { isEmpty } from 'remeda';
+  import { forEach, isEmpty } from 'remeda';
   import Alert from '$lib/components/Alert.svelte';
   import SetImage from '$lib/components/modals/SetImage.svelte';
   import { type Writable, writable } from 'svelte/store';
@@ -55,7 +55,7 @@
     return () => {
       errors = [];
       if (!isEmpty($filePreviews)) {
-        $filePreviews.forEach(({ src }) => URL.revokeObjectURL(src));
+        forEach(filePreviews, (src) => URL.revokeObjectURL(src));
         $filePreviews = [];
       }
     };

@@ -1,3 +1,4 @@
+import type { Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/prisma';
 import { faker } from '@faker-js/faker/locale/en';
@@ -93,4 +94,4 @@ export const actions = {
       };
     }
   },
-};
+} satisfies Actions;

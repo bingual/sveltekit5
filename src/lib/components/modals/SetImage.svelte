@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button, Fileupload, Helper, Img, Modal, type uiHelpers } from 'svelte-5-ui-lib';
-  import { isEmpty, map } from 'remeda';
+  import { forEach, isEmpty, map } from 'remeda';
   import type { Writable } from 'svelte/store';
   import { useContext } from '$lib/utils/stores';
   import { imageFilesSchema } from '$lib/utils/schema';
@@ -77,7 +77,7 @@
 
     return () => {
       if (!isEmpty(filePreviews)) {
-        filePreviews.forEach(({ src }) => URL.revokeObjectURL(src));
+        forEach(filePreviews, (src) => URL.revokeObjectURL(src));
         filePreviews = [];
       }
     };
