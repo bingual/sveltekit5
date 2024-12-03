@@ -6,11 +6,10 @@ const { setupBrowser, scrollToTheBottom, getEmptyFieldNames } = scrapManager();
 const scrapBrands = async () => {
   const getBrandInfos = async (brandContainer: Locator[], collectedBrandIndexes: Set<string>) => {
     type CollectedBrandInfos = {
+      brandUrl: string;
+      brandLogoUrl: string;
       brandName: string;
-      brandLink: string;
-      brandLogo: string;
     };
-
     const collectedBrandInfos: CollectedBrandInfos[] = [];
 
     for await (const container of brandContainer) {
@@ -23,22 +22,19 @@ const scrapBrands = async () => {
             if (await section.isVisible()) {
               const header = section.locator('header > div > div');
 
-              const [brandName, brandLink, brandLogo] = await Promise.all([
+              const [brandUrl, brandLogoUrl, brandName] = await Promise.all([
+                (await header.locator('div > a').first().getAttribute('href')) ?? '',
+                (await header.locator('div > img').first().getAttribute('src')) ?? '',
                 await header.locator('div > a').first().innerText(),
-                await header.locator('div > a').first().getAttribute('href'),
-                await header.locator('div > img').first().getAttribute('src'),
               ]);
 
-              getEmptyFieldNames({
-                brandName: brandName,
-                brandLink: brandLink ?? '',
-                brandLogo: brandLogo ?? '',
-              });
-              collectedBrandInfos.push({
-                brandName: brandName,
-                brandLink: brandLink ?? '',
-                brandLogo: brandLogo ?? '',
-              });
+              const fields: CollectedBrandInfos = {
+                brandUrl,
+                brandLogoUrl,
+                brandName,
+              };
+              getEmptyFieldNames(fields);
+              collectedBrandInfos.push(fields);
             }
           }
           collectedBrandIndexes.add(containerIndex);
@@ -50,9 +46,8 @@ const scrapBrands = async () => {
   };
 
   const run = async () => {
+    const { page, browser } = await setupBrowser();
     try {
-      const { page, browser } = await setupBrowser();
-
       await page.goto(
         `https://www.musinsa.com/main/musinsa/brand?skip_bf=Y&sectionId=561&categoryCode=000`,
       );
@@ -70,17 +65,15 @@ const scrapBrands = async () => {
 
       console.log(scrollWithGetBrandInfos);
       console.log(`length: ${scrollWithGetBrandInfos.length}`);
-
+    } catch (err) {
+      console.log(err);
+    } finally {
       await page.close();
       await browser.close();
-    } catch (e) {
-      console.log(e);
     }
   };
 
   await run();
 };
 
-(async () => {
-  await scrapBrands();
-})();
+(async () => await scrapBrands())();

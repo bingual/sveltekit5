@@ -9,13 +9,15 @@ import { filter, join, map, pipe } from 'remeda';
 
 export const scrapManager = () => {
   const setupBrowser = async (
-    headless: LaunchOptions['headless'] = false,
+    headless: LaunchOptions['headless'] = true,
     timeout: LaunchOptions['timeout'] = 15000,
     viewport: BrowserContextOptions['viewport'] = { width: 1280, height: 720 },
   ) => {
-    const browser = await chromium.launch({ headless, timeout });
+    const browser = await chromium.launch({ headless });
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
+
+    page.setDefaultTimeout(timeout);
 
     return { page, browser };
   };
