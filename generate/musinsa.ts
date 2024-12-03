@@ -1,11 +1,17 @@
 import { scrapManager } from './scraper';
 import type { Locator } from '@playwright/test';
 
-const { setupBrowser, scrollToTheBottom } = scrapManager();
+const { setupBrowser, scrollToTheBottom, getEmptyFieldNames } = scrapManager();
 
 const scrapBrands = async () => {
-  const getBrandData = async (brandContainer: Locator[], collectedBrandIndexes: Set<string>) => {
-    const collectedBrandData: Record<string, string>[] = [];
+  const getBrandInfos = async (brandContainer: Locator[], collectedBrandIndexes: Set<string>) => {
+    type CollectedBrandInfos = {
+      brandName: string;
+      brandLink: string;
+      brandLogo: string;
+    };
+
+    const collectedBrandInfos: CollectedBrandInfos[] = [];
 
     for await (const container of brandContainer) {
       if (await container.isVisible()) {
@@ -23,7 +29,12 @@ const scrapBrands = async () => {
                 await header.locator('div > img').first().getAttribute('src'),
               ]);
 
-              collectedBrandData.push({
+              getEmptyFieldNames({
+                brandName: brandName,
+                brandLink: brandLink ?? '',
+                brandLogo: brandLogo ?? '',
+              });
+              collectedBrandInfos.push({
                 brandName: brandName,
                 brandLink: brandLink ?? '',
                 brandLogo: brandLogo ?? '',
@@ -35,34 +46,36 @@ const scrapBrands = async () => {
       }
     }
 
-    return collectedBrandData;
+    return collectedBrandInfos;
   };
 
   const run = async () => {
-    const { page, browser } = await setupBrowser();
+    try {
+      const { page, browser } = await setupBrowser();
 
-    await page.goto(
-      `https://www.musinsa.com/main/musinsa/brand?skip_bf=Y&sectionId=561&categoryCode=000`,
-    );
+      await page.goto(
+        `https://www.musinsa.com/main/musinsa/brand?skip_bf=Y&sectionId=561&categoryCode=000`,
+      );
 
-    const brandContainer = await page
-      .locator('#commonLayoutContents > article > div:nth-child(3) > div > div > div')
-      .all();
+      const brandContainer = await page
+        .locator('#commonLayoutContents > article > div:nth-child(3) > div > div > div')
+        .all();
 
-    const scrollWithGetBrandData = await scrollToTheBottom(getBrandData)(
-      page,
-      brandContainer,
-      400,
-      100,
-    );
+      const scrollWithGetBrandInfos = await scrollToTheBottom(getBrandInfos)(
+        page,
+        brandContainer,
+        400,
+        100,
+      );
 
-    if (scrollWithGetBrandData && scrollWithGetBrandData?.length < 99) {
-      console.log(scrollWithGetBrandData);
-      console.log('누락된 사항 있음');
+      console.log(scrollWithGetBrandInfos);
+      console.log(`length: ${scrollWithGetBrandInfos.length}`);
+
+      await page.close();
+      await browser.close();
+    } catch (e) {
+      console.log(e);
     }
-
-    await page.close();
-    await browser.close();
   };
 
   await run();
