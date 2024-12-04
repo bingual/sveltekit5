@@ -38,9 +38,9 @@ export const scrapManager = () => {
   };
 
   const scrollToTheBottom =
-    <T>(callBack: (container: Locator[], collectedBrandIndexes: Set<string>) => Promise<T[]>) =>
+    <T>(callBack: (container: Locator[], collectedIndexes: Set<string>) => Promise<T[]>) =>
     async (page: Page, container: Locator[], scrollStep = 500, sleepInterval = 200) => {
-      const collectedBrandIndexes = new Set<string>();
+      const collectedIndexes = new Set<string>();
       const results: T[] = [];
 
       while (true) {
@@ -53,13 +53,10 @@ export const scrapManager = () => {
           break;
         }
 
-        const result = await callBack(container, collectedBrandIndexes);
+        const result = await callBack(container, collectedIndexes);
         results.push(...result);
 
-        await page.evaluate((step) => {
-          window.scrollBy(0, step);
-        }, scrollStep);
-
+        await page.mouse.wheel(0, scrollStep);
         await sleep(sleepInterval);
       }
 

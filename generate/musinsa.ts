@@ -6,9 +6,9 @@ const { setupBrowser, scrollToTheBottom, getEmptyFieldNames } = scrapManager();
 const scrapBrands = async () => {
   const getBrandInfos = async (brandContainer: Locator[], collectedBrandIndexes: Set<string>) => {
     type CollectedBrandInfos = {
+      brandName: string;
       brandUrl: string;
       brandLogoUrl: string;
-      brandName: string;
     };
     const collectedBrandInfos: CollectedBrandInfos[] = [];
 
@@ -22,16 +22,16 @@ const scrapBrands = async () => {
             if (await section.isVisible()) {
               const header = section.locator('header > div > div');
 
-              const [brandUrl, brandLogoUrl, brandName] = await Promise.all([
+              const [brandName, brandUrl, brandLogoUrl] = await Promise.all([
+                await header.locator('div > a').first().innerText(),
                 (await header.locator('div > a').first().getAttribute('href')) ?? '',
                 (await header.locator('div > img').first().getAttribute('src')) ?? '',
-                await header.locator('div > a').first().innerText(),
               ]);
 
               const fields: CollectedBrandInfos = {
+                brandName,
                 brandUrl,
                 brandLogoUrl,
-                brandName,
               };
               getEmptyFieldNames(fields);
               collectedBrandInfos.push(fields);
@@ -66,7 +66,7 @@ const scrapBrands = async () => {
       console.log(scrollWithGetBrandInfos);
       console.log(`length: ${scrollWithGetBrandInfos.length}`);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     } finally {
       await page.close();
       await browser.close();

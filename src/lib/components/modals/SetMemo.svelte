@@ -55,7 +55,7 @@
     return () => {
       errors = [];
       if (!isEmpty($filePreviews)) {
-        forEach(filePreviews, (src) => URL.revokeObjectURL(src));
+        forEach($filePreviews, (file) => URL.revokeObjectURL(file.src));
         $filePreviews = [];
       }
     };
