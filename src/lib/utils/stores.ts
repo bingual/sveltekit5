@@ -76,6 +76,7 @@ export const toastStore = () => {
 export const modalStore = () => {
   const modalNames = {
     SetMemo: 'SetMemo',
+    SetVideo: 'SetVideo',
   } as const;
 
   type ModalName = (typeof modalNames)[keyof typeof modalNames] | '';
@@ -119,7 +120,7 @@ export const modalStore = () => {
     name: DefaultState['currentModalName'],
     title?: DefaultState['modalTitle'],
     buttons?: DefaultState['modalButtonLabels'],
-    props?: any,
+    props?: DefaultState['modalProps'],
   ) => {
     currentModalName.set(name);
     modalUi.toggle();

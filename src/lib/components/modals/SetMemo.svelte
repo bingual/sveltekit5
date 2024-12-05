@@ -101,12 +101,14 @@
 
     <!-- 스니펫에서는 현재 타입 지정 불가능 (정확히는 IDE에서 오류나고 적용 한다해도 유지보수 매우 불편해짐)  -->
     {#snippet imageSection(labelClass, label, images, filePreviews)}
+      {@const imgClass = clsx('w-24 h-24 object-cover')}
+
       <Label class="mb-2 mt-5 space-y-2"><span class={labelClass}>{label}</span></Label>
       <div class="grid grid-cols-4 gap-4 sm:grid-cols-8">
         {#if images}
           {#each images as { url }, index}
             <Img
-              imgClass="object-cover w-24 h-24"
+              {imgClass}
               src={url.startsWith('https://') ? url : getPublicUrl(url)}
               alt={String(index)}
               shadow="md"
@@ -116,7 +118,7 @@
 
         {#if filePreviews}
           {#each filePreviews as { src, alt }}
-            <Img imgClass="object-cover w-24 h-24" {src} {alt} shadow="md" />
+            <Img {imgClass} {src} {alt} shadow="md" />
           {/each}
         {/if}
       </div>

@@ -32,7 +32,7 @@
     { name: '내용', value: 'content' },
   ];
 
-  const handleModal = (action: ActionType, data?: Memo) => {
+  const handleModal = (action: ActionType, memoData?: Memo) => {
     const actionMap = {
       create: {
         modalTitle: '메모 생성',
@@ -42,7 +42,7 @@
       update: {
         modalTitle: `메모 수정`,
         modalButtonLabels: { confirm: '수정', cancel: '취소' },
-        props: { data, action },
+        props: { data: memoData, action },
       },
     };
 

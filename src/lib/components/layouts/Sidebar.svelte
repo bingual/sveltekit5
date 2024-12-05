@@ -1,23 +1,25 @@
 <script lang="ts">
   import {
+    type uiHelpers,
     Sidebar,
     SidebarGroup,
     SidebarItem,
     SidebarDropdownWrapper,
-    SidebarButton,
-    uiHelpers,
   } from 'svelte-5-ui-lib';
   import { ChartOutline, PenNibOutline, LightbulbOutline, CogOutline } from 'flowbite-svelte-icons';
   import { page } from '$app/stores';
   import { dev } from '$app/environment';
+  import clsx from 'clsx';
+
+  const { sidebarUi }: { sidebarUi: ReturnType<typeof uiHelpers> } = $props();
 
   const userInfo = $derived($page.data.session?.user);
 
-  const spanClass = 'flex-1 ms-3 whitespace-nowrap';
-  const iconClass =
-    'h-5 w-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white';
+  const spanClass = clsx('flex-1 ms-3 whitespace-nowrap');
+  const iconClass = clsx(
+    'h-5 w-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white',
+  );
 
-  const sidebarUi = uiHelpers();
   let isOpen = $state(false);
   const closeDemoSidebar = sidebarUi.close;
 
@@ -48,6 +50,11 @@
       items: [
         { label: '대쉬보드', href: '/', icon: ChartOutline },
         ...(userInfo ? [{ label: '메모', href: '/memo', icon: PenNibOutline }] : []),
+        {
+          label: '플레이리스트',
+          icon: LightbulbOutline,
+          children: [{ childLabel: '멜론차트', childHref: '/playlist/melonChart' }],
+        },
       ],
     },
     {
@@ -76,7 +83,6 @@
   });
 </script>
 
-<SidebarButton onclick={sidebarUi.toggle} class="mb-2" />
 <div class="relative">
   <Sidebar
     class="top-[61px] z-50 h-full"
@@ -86,14 +92,14 @@
     closeSidebar={closeDemoSidebar}
     params={{ x: -50, duration: 50 }}
     position="fixed"
-    activeClass="p-2"
-    nonActiveClass="p-2"
+    activeClass={clsx('p-2')}
+    nonActiveClass={clsx('p-2')}
   >
     {#each sections as section}
       <SidebarGroup border={section.options[0].border}>
         {#each section.items as item}
           {#if item.children}
-            <SidebarDropdownWrapper label={item.label} btnClass="p-2">
+            <SidebarDropdownWrapper label={item.label} btnClass={clsx('p-2')}>
               {#snippet iconSlot()}
                 <item.icon class={iconClass} />
               {/snippet}

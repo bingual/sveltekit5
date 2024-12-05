@@ -8,6 +8,7 @@
   import Toast from '$lib/components/layouts/Toast.svelte';
   import { isLoading, modalStore, toastStore, useContext } from '$lib/utils/stores';
   import Spinner from '$lib/components/layouts/Spinner.svelte';
+  import { uiHelpers } from 'svelte-5-ui-lib';
 
   let { children } = $props();
   setContext('toastStore', toastStore());
@@ -24,12 +25,17 @@
 
   const { modalUi, currentModalName, modalNames } = modalState();
 
+  const sidebarUi = uiHelpers();
+
   let ModalComponent: any = $state();
 
   const loadComponent = async (name: string) => {
     switch (name) {
       case modalNames.SetMemo:
         ModalComponent = (await import('$lib/components/modals/SetMemo.svelte')).default;
+        break;
+      case modalNames.SetVideo:
+        ModalComponent = (await import('$lib/components/modals/SetVideo.svelte')).default;
         break;
       default:
         return undefined;
@@ -50,12 +56,12 @@
 <header
   class="fixed top-0 z-40 mx-auto w-full flex-none border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
 >
-  <Navbar />
+  <Navbar {sidebarUi} />
 </header>
 
 <div class="overflow-hidden lg:flex">
-  <Sidebar />
-  <div class="relative h-full w-full overflow-y-auto px-6 pb-4 pt-6 md:ml-64 md:pt-20">
+  <Sidebar {sidebarUi} />
+  <div class="relative h-full w-full overflow-y-auto px-6 pb-4 pt-20 md:ml-64">
     <ParaglideJS {i18n}>
       {@render children()}
     </ParaglideJS>

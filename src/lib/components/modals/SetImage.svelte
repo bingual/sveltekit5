@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { Button, Fileupload, Helper, Img, Modal, type uiHelpers } from 'svelte-5-ui-lib';
+  import { uiHelpers, Button, Fileupload, Helper, Img, Modal } from 'svelte-5-ui-lib';
   import { forEach, isEmpty, map } from 'remeda';
   import type { Writable } from 'svelte/store';
   import { useContext } from '$lib/utils/stores';
   import { imageFilesSchema } from '$lib/utils/schema';
   import Alert from '$lib/components/Alert.svelte';
   import { actionMap } from '$lib/utils/mapping';
+  import clsx from 'clsx';
 
   const {
     modalStore: { modalState },
@@ -96,8 +97,8 @@
     <div class="mt-4 grid grid-cols-4 gap-4">
       {#each filePreviews as { src, alt }}
         <Img
-          imgClass="w-24 h-24 object-cover"
-          captionClass="line-clamp-2"
+          imgClass={clsx('w-24 h-24 object-cover')}
+          captionClass={clsx('line-clamp-2')}
           {src}
           {alt}
           caption={alt}

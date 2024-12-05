@@ -1,13 +1,21 @@
 import { scrapManager } from './scraper';
 import { Locator, Page } from '@playwright/test';
+import { prisma } from '$lib/prisma';
+import { pipe, split, map, join } from 'remeda';
 
 const { setupBrowser, getEmptyFieldNames } = scrapManager();
 
-const scrapYoutubeMelon = async () => {
+const scrapYoutubePlaylist = async () => {
+  const getPlaylist = async (page: Page) => {
+    return await page
+      .locator(
+        '#page-header > yt-page-header-renderer > yt-page-header-view-model > div.page-header-view-model-wiz__page-header-content > div.page-header-view-model-wiz__page-header-headline > div > yt-dynamic-text-view-model > h1 > span',
+      )
+      .innerText();
+  };
+
   const getVideoInfos = async (page: Page, sections: Locator[]) => {
     type CollectedVideoInfos = {
-      mainTitle: string;
-      rank: string;
       time: string;
       title: string;
       author: string;
@@ -18,16 +26,9 @@ const scrapYoutubeMelon = async () => {
     };
     const collectedVideoInfos: CollectedVideoInfos[] = [];
 
-    const mainTitle = await page
-      .locator(
-        '#page-header > yt-page-header-renderer > yt-page-header-view-model > div.page-header-view-model-wiz__page-header-content > div.page-header-view-model-wiz__page-header-headline > div > yt-dynamic-text-view-model > h1 > span',
-      )
-      .innerText();
-
     for await (const section of sections) {
       const videoInfo = section.locator('#video-info');
-      const [rank, time, title, author, views, date, thumbUrl] = await Promise.all([
-        await section.locator('#index').innerText(),
+      const [time, title, author, views, date, thumbUrl] = await Promise.all([
         await section
           .locator(
             '#overlays > ytd-thumbnail-overlay-time-status-renderer > div.thumbnail-overlay-badge-shape.style-scope.ytd-thumbnail-overlay-time-status-renderer > badge-shape > div',
@@ -48,14 +49,19 @@ const scrapYoutubeMelon = async () => {
 
       const shareUrlInput = page.locator('#share-url');
       await shareUrlInput.waitFor({ state: 'visible' });
-      const shareUrl = await shareUrlInput.inputValue();
+      const originShareUrl = await shareUrlInput.inputValue();
+
+      const shareUrl = pipe(
+        originShareUrl,
+        split(' '),
+        map((url) => url.replace('https://youtu.be/', 'https://www.youtube.com/embed/')),
+        join('/'),
+      );
 
       const closeBtn = page.locator('#close-button');
       await closeBtn.click();
 
       const fields: CollectedVideoInfos = {
-        mainTitle,
-        rank,
         time,
         title,
         author,
@@ -79,10 +85,27 @@ const scrapYoutubeMelon = async () => {
       const contents = page.locator('#contents');
       const sections = await contents.locator('ytd-playlist-video-renderer').all();
 
-      const videoInfos = await getVideoInfos(page, sections);
+      const mainTitle = await getPlaylist(page);
+      const collectedVideoInfos = await getVideoInfos(page, sections);
 
-      console.log(videoInfos);
-      console.log(`length: ${videoInfos.length}`);
+      const findPlaylist = await prisma.youTubePlaylist.findFirst({
+        where: {
+          title: mainTitle,
+        },
+      });
+
+      if (!findPlaylist) {
+        const createPlaylistWithVideo = await prisma.youTubePlaylist.create({
+          data: {
+            title: mainTitle,
+            videoInfos: { createMany: { data: collectedVideoInfos } },
+          },
+        });
+
+        console.log(createPlaylistWithVideo);
+      } else {
+        console.log('이미 존재하는 플레이 리스트입니다.');
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -94,4 +117,4 @@ const scrapYoutubeMelon = async () => {
   await run();
 };
 
-(async () => await scrapYoutubeMelon())();
+(async () => await scrapYoutubePlaylist())();

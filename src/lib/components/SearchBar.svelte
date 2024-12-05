@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ButtonGroup, Button, Select, Search } from 'svelte-5-ui-lib';
   import { SearchOutline } from 'flowbite-svelte-icons';
+  import clsx from 'clsx';
 
   const { items: originItems }: { items: { name: string; value: string }[] } = $props();
   const items = [{ name: '전체', value: 'all' }, ...originItems];
@@ -18,7 +19,12 @@
         bind:value={selectCategory}
         placeholder="...선택"
       />
-      <Search inputClass="rounded-none" name="query" placeholder="...검색" required={false} />
+      <Search
+        inputClass={clsx('rounded-none')}
+        name="query"
+        placeholder="...검색"
+        required={false}
+      />
       <Button class="rounded-s-none" type="submit" color="primary">
         <SearchOutline class="h-6 w-6" />
       </Button>
