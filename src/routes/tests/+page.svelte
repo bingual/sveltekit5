@@ -1,36 +1,15 @@
-<script lang="ts">
-  import { Fileupload, Img } from 'svelte-5-ui-lib';
-  let selectedFiles: FileList | undefined = $state();
-
-  let filePreviews = $derived(
-    selectedFiles
-      ? Array.from(selectedFiles).map((file) => ({
-          src: URL.createObjectURL(file),
-          alt: file.name,
-        }))
-      : [],
-  );
-
-  $effect(() => {
-    return () => {
-      filePreviews.forEach(({ src }) => URL.revokeObjectURL(src));
-    };
-  });
+<script>
 </script>
 
-<Fileupload clearable bind:files={selectedFiles} multiple />
-
-<div class="mt-4">
-  <div class="grid grid-cols-4 gap-4">
-    {#each filePreviews as { src, alt }}
-      <Img
-        imgClass="h-32 w-32 object-cover"
-        {src}
-        {alt}
-        caption={alt}
-        alignment="center"
-        shadow="md"
-      />
-    {/each}
-  </div>
+<div>
+  <iframe
+    width="560"
+    height="315"
+    src="https://www.youtube.com/embed/U1_0Vc-9mNw?si=Ga5F6SLT01iGQjxr"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+  ></iframe>
 </div>

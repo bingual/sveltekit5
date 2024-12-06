@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { Toast } from 'svelte-5-ui-lib';
-  import { CheckCircleSolid } from 'flowbite-svelte-icons';
   import { useContext } from '$lib/utils/stores';
+
+  import { CheckCircleSolid } from 'flowbite-svelte-icons';
+  import { Toast } from 'svelte-5-ui-lib';
 
   const { toastStore } = useContext();
   const { toasts, removeToast } = toastStore;

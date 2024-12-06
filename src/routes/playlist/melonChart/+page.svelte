@@ -1,18 +1,20 @@
 <script lang="ts">
-  import type { PageData } from './$types';
+  import { useContext } from '$lib/utils/stores';
+
   import type { YouTubeVideoInfo } from '@prisma/client';
+  import clsx from 'clsx';
   import {
+    A,
+    Img,
     Table,
+    TableBody,
+    TableBodyCell,
+    TableBodyRow,
     TableHead,
     TableHeadCell,
-    TableBody,
-    TableBodyRow,
-    TableBodyCell,
-    Img,
-    A,
   } from 'svelte-5-ui-lib';
-  import { useContext } from '$lib/utils/stores';
-  import clsx from 'clsx';
+
+  import type { PageData } from './$types';
 
   const {
     modalStore: { setModal },

@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { uiHelpers, Button, Fileupload, Helper, Img, Modal } from 'svelte-5-ui-lib';
-  import { forEach, isEmpty, map } from 'remeda';
-  import type { Writable } from 'svelte/store';
-  import { useContext } from '$lib/utils/stores';
-  import { imageFilesSchema } from '$lib/utils/schema';
   import Alert from '$lib/components/Alert.svelte';
   import { actionMap } from '$lib/utils/mapping';
+  import { imageFilesSchema } from '$lib/utils/schema';
+  import { useContext } from '$lib/utils/stores';
+
   import clsx from 'clsx';
+  import { forEach, isEmpty, map } from 'remeda';
+  import type { Writable } from 'svelte/store';
+  import { Button, Fileupload, Helper, Img, Modal, uiHelpers } from 'svelte-5-ui-lib';
 
   const {
     modalStore: { modalState },

@@ -1,15 +1,16 @@
 <script lang="ts">
+  import { dev } from '$app/environment';
+  import { page } from '$app/stores';
+
+  import clsx from 'clsx';
+  import { ChartOutline, CogOutline, LightbulbOutline, PenNibOutline } from 'flowbite-svelte-icons';
   import {
-    type uiHelpers,
     Sidebar,
+    SidebarDropdownWrapper,
     SidebarGroup,
     SidebarItem,
-    SidebarDropdownWrapper,
+    type uiHelpers,
   } from 'svelte-5-ui-lib';
-  import { ChartOutline, PenNibOutline, LightbulbOutline, CogOutline } from 'flowbite-svelte-icons';
-  import { page } from '$app/stores';
-  import { dev } from '$app/environment';
-  import clsx from 'clsx';
 
   const { sidebarUi }: { sidebarUi: ReturnType<typeof uiHelpers> } = $props();
 

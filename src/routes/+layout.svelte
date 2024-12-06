@@ -1,14 +1,16 @@
 <script lang="ts">
-  import { i18n } from '$lib/i18n';
-  import { ParaglideJS } from '@inlang/paraglide-sveltekit';
-  import '@/app.pcss';
-  import { setContext } from 'svelte';
   import Navbar from '$lib/components/layouts/Navbar.svelte';
   import Sidebar from '$lib/components/layouts/Sidebar.svelte';
-  import Toast from '$lib/components/layouts/Toast.svelte';
-  import { isLoading, modalStore, toastStore, useContext } from '$lib/utils/stores';
   import Spinner from '$lib/components/layouts/Spinner.svelte';
+  import Toast from '$lib/components/layouts/Toast.svelte';
+  import { i18n } from '$lib/i18n';
+  import { isLoading, modalStore, toastStore, useContext } from '$lib/utils/stores';
+
+  import { ParaglideJS } from '@inlang/paraglide-sveltekit';
+  import { setContext } from 'svelte';
   import { uiHelpers } from 'svelte-5-ui-lib';
+
+  import '@/app.pcss';
 
   let { children } = $props();
   setContext('toastStore', toastStore());

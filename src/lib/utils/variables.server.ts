@@ -1,7 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
 import { PUBLIC_SUPABASE_BUCKET } from '$env/static/public';
 import { supabase } from '$lib/supabaseClient';
+
 import sharp from 'sharp';
+import { v4 as uuidv4 } from 'uuid';
 
 export const storageManager = () => {
   const getFileExtension = (fileName: string): string => {

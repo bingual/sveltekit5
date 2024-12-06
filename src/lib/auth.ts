@@ -1,6 +1,7 @@
 import { prisma } from '$lib/prisma';
-import { DefaultSession, SvelteKitAuth } from '@auth/sveltekit';
+
 import { PrismaAdapter } from '@auth/prisma-adapter';
+import { DefaultSession, SvelteKitAuth } from '@auth/sveltekit';
 import GitHub from '@auth/sveltekit/providers/github';
 
 declare module '@auth/sveltekit' {

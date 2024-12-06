@@ -1,24 +1,25 @@
 <script lang="ts">
-  import {
-    Navbar,
-    NavBrand,
-    NavUl,
-    NavLi,
-    uiHelpers,
-    NavHamburger,
-    Dropdown,
-    DropdownHeader,
-    DropdownUl,
-    DropdownLi,
-    Avatar,
-    DropdownFooter,
-    Button,
-    Img,
-  } from 'svelte-5-ui-lib';
-  import { sineIn } from 'svelte/easing';
   import { page } from '$app/stores';
+
   import { SignIn, SignOut } from '@auth/sveltekit/components';
   import clsx from 'clsx';
+  import { sineIn } from 'svelte/easing';
+  import {
+    Avatar,
+    Button,
+    Dropdown,
+    DropdownFooter,
+    DropdownHeader,
+    DropdownLi,
+    DropdownUl,
+    Img,
+    Navbar,
+    NavBrand,
+    NavHamburger,
+    NavLi,
+    NavUl,
+    uiHelpers,
+  } from 'svelte-5-ui-lib';
 
   const userInfo = $derived($page.data.session?.user);
 

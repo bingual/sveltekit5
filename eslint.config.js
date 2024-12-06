@@ -1,9 +1,10 @@
 import js from '@eslint/js';
-import ts from 'typescript-eslint';
-import svelte from 'eslint-plugin-svelte';
 import prettier from 'eslint-config-prettier';
-import globals from 'globals';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import svelte from 'eslint-plugin-svelte';
 import unusedImports from 'eslint-plugin-unused-imports';
+import globals from 'globals';
+import ts from 'typescript-eslint';
 
 export default ts.config(
   js.configs.recommended,
@@ -33,6 +34,7 @@ export default ts.config(
   {
     plugins: {
       'unused-imports': unusedImports,
+      'simple-import-sort': simpleImportSort,
     },
   },
   {
@@ -52,6 +54,13 @@ export default ts.config(
           argsIgnorePattern: '^_',
         },
       ],
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [['^\\$'], ['^node:'], ['^@?\\w'], ['^@/'], ['^\\.\\./', '^\\./'], ['\\.s?css$']],
+        },
+      ],
+      'simple-import-sort/exports': 'error',
     },
   },
 );

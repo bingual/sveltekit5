@@ -1,9 +1,9 @@
 import {
-  chromium,
   type BrowserContextOptions,
+  chromium,
   type LaunchOptions,
-  type Page,
   type Locator,
+  type Page,
 } from '@playwright/test';
 import { filter, join, map, pipe } from 'remeda';
 

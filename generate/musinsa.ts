@@ -1,5 +1,6 @@
-import { scrapManager } from './scraper';
 import type { Locator } from '@playwright/test';
+
+import { scrapManager } from './scraper';
 
 const { setupBrowser, scrollToTheBottom, getEmptyFieldNames } = scrapManager();
 

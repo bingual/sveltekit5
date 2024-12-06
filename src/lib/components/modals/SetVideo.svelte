@@ -1,6 +1,7 @@
 <script lang="ts">
-  import type { YouTubeVideoInfo } from '@prisma/client';
   import { useContext } from '$lib/utils/stores';
+
+  import type { YouTubeVideoInfo } from '@prisma/client';
   import { Modal } from 'svelte-5-ui-lib';
 
   const {

@@ -1,8 +1,8 @@
-import flowbitePlugin from 'flowbite/plugin';
 import aspectRatio from '@tailwindcss/aspect-ratio';
 import containerQueries from '@tailwindcss/container-queries';
 import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
+import flowbitePlugin from 'flowbite/plugin';
 import type { Config } from 'tailwindcss';
 
 export default {

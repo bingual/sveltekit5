@@ -1,8 +1,9 @@
-import { get, type Writable, writable } from 'svelte/store';
 import { localStorageManager } from '$lib/utils/variables.js';
-import { getContext } from 'svelte';
-import { uiHelpers } from 'svelte-5-ui-lib';
+
 import { filter, forEach, map } from 'remeda';
+import { getContext } from 'svelte';
+import { get, type Writable, writable } from 'svelte/store';
+import { uiHelpers } from 'svelte-5-ui-lib';
 
 const persistentStore = (key: string, startValue: any) => {
   const { loadFromLocalStorage, saveToLocalStorage } = localStorageManager();

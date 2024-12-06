@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Alert } from 'svelte-5-ui-lib';
   import { InfoCircleSolid } from 'flowbite-svelte-icons';
+  import { Alert } from 'svelte-5-ui-lib';
 
   const { errors }: { errors: ValidationError[] } = $props();
 </script>

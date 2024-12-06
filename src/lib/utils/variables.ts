@@ -1,10 +1,11 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
-import { get, writable } from 'svelte/store';
-import { supabase } from '$lib/supabaseClient';
 import { PUBLIC_SUPABASE_BUCKET } from '$env/static/public';
+import { supabase } from '$lib/supabaseClient';
+
 import { onDestroy } from 'svelte';
+import { get, writable } from 'svelte/store';
 
 export const localStorageManager = () => {
   if (!browser) {

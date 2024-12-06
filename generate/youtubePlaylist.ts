@@ -1,7 +1,9 @@
-import { scrapManager } from './scraper';
-import { Locator, Page } from '@playwright/test';
 import { prisma } from '$lib/prisma';
-import { pipe, split, map, join } from 'remeda';
+
+import { Locator, Page } from '@playwright/test';
+import { join, map, pipe, split } from 'remeda';
+
+import { scrapManager } from './scraper';
 
 const { setupBrowser, getEmptyFieldNames } = scrapManager();
 

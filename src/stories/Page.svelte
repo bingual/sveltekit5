@@ -1,6 +1,7 @@
 <script lang="ts">
-  import './page.css';
   import Header from './Header.svelte';
+
+  import './page.css';
 
   type User = { name: string } | undefined;
   let user = $state<User>(undefined);
