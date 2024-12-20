@@ -4,7 +4,8 @@
   import SearchBar from '$lib/components/SearchBar.svelte';
   import { actionMap } from '$lib/utils/mapping';
   import { useContext } from '$lib/utils/stores';
-  import { generateNoDataMessage, getPublicUrl, useLoadMore } from '$lib/utils/variables';
+  import { getPublicUrl } from '$lib/utils/variables';
+  import { generateNoDataMessage, useLoadMore } from '$lib/utils/variables.svelte';
 
   import type { Memo } from '@prisma/client';
   import { EditOutline, PenNibOutline, TrashBinOutline } from 'flowbite-svelte-icons';
@@ -102,7 +103,8 @@
         >
           <div class="prose pb-16 lg:prose-lg xl:prose-xl">
             <h3 class="line-clamp-2">{memo.title}</h3>
-            <p class="line-clamp-4">{memo.content}</p>
+            <!-- TODO: 나중에 내용 적당히 자를 수 있는 방법 적용해야함 -->
+            <!--            <p class="line-clamp-4"><Render html={memo.content} /></p>-->
           </div>
 
           <div class="absolute bottom-3 left-3 flex gap-x-2 p-3">
@@ -122,7 +124,7 @@
     {#if data.memoTotalCount > interval}
       <div class="mt-10 grid place-items-center">
         <div class="text-center">
-          {#if data.memoTotalCount > $currentTake}
+          {#if data.memoTotalCount > currentTake}
             <Button class="w-full rounded-none" size="lg" color="dark" onclick={loadMoreData}
               >더 보기</Button
             >
@@ -132,7 +134,7 @@
             {`${data.memoTotalCount}개 목록 중 ${data.memos.length}개를 보셨습니다.`}
           </div>
 
-          {#if data.memoTotalCount <= $currentTake}
+          {#if data.memoTotalCount <= currentTake}
             <div class="mt-2">
               <button class="underline" onclick={async () => await goto('#')}>
                 첫 번째 페이지로 이동

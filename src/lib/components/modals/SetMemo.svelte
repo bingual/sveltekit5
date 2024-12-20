@@ -1,18 +1,17 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import Alert from '$lib/components/Alert.svelte';
+  import MarkDownEditor from '$lib/components/MarkDownEditor.svelte';
   import SetImage from '$lib/components/modals/SetImage.svelte';
   import { actionMap } from '$lib/utils/mapping';
   import type { MemoWithImages } from '$lib/utils/prismaTypes';
   import { useContext } from '$lib/utils/stores';
-  import { getPublicUrl } from '$lib/utils/variables';
 
   import type { SubmitFunction } from '@sveltejs/kit';
-  import clsx from 'clsx';
   import { ImageSolid } from 'flowbite-svelte-icons';
   import { forEach, isEmpty } from 'remeda';
   import { type Writable, writable } from 'svelte/store';
-  import { Button, Img, Input, Label, Modal, Textarea, uiHelpers } from 'svelte-5-ui-lib';
+  import { Button, Input, Label, Modal, uiHelpers } from 'svelte-5-ui-lib';
 
   const {
     modalStore: { modalState },
@@ -23,10 +22,12 @@
   const closeModal = modalUi.close;
 
   let memoData: MemoWithImages | undefined = $derived($modalProps?.data);
+
   let modalStatus = $state(false);
   let formId = $state('SetMemoForm');
   let errors = $state<ValidationError[]>([]);
 
+  let editorContent = writable('');
   let selectedFiles: Writable<FileList | undefined> = writable();
   let filePreviews: Writable<FilePreview[]> = writable([]);
 
@@ -64,7 +65,6 @@
 </script>
 
 <!-- FIXME: 현재 svelte-5-ui-lib 베타버전 모달은 X축 반응형 동작에 버그있음. 모바일 환경에서 치명적임-->
-<!-- TODO: MarkDown Editor 로 변경할 예정 -->
 <Modal title={$modalTitle} {modalStatus} {closeModal}>
   <div class="max-h-[70vh] overflow-hidden overflow-y-auto">
     {#if !isEmpty(errors)}
@@ -79,64 +79,19 @@
       enctype="multipart/form-data"
     >
       <input type="hidden" name="id" value={memoData?.id} />
+      <input type="hidden" name="content" bind:value={$editorContent} />
       <input type="file" hidden={true} name="images" bind:files={$selectedFiles} multiple />
       <div>
         <div>
           <Label class="mb-2 space-y-2" for="title"><span>제목</span></Label>
-          <Input type="text" id="title" name="title" value={memoData?.title} required />
+          <Input type="text" id="title" name="title" value={memoData?.title} />
         </div>
 
         <div class="mt-5">
-          <Label class="my-2 space-y-2" for="content"><span>내용</span></Label>
-          <Textarea
-            class="mt-2 resize-none"
-            id="content"
-            name="content"
-            rows={15}
-            value={memoData?.content}
-            required
-          />
+          <MarkDownEditor {memoData} {editorContent} {filePreviews} />
         </div>
       </div>
     </form>
-
-    <!-- 스니펫에서는 현재 타입 지정 불가능 (정확히는 IDE에서 오류나고 적용 한다해도 유지보수 매우 불편해짐)  -->
-    {#snippet imageSection(labelClass, label, images, filePreviews)}
-      {@const imgClass = clsx('w-24 h-24 object-cover')}
-
-      <Label class="mb-2 mt-5 space-y-2"><span class={labelClass}>{label}</span></Label>
-      <div class="grid grid-cols-4 gap-4 sm:grid-cols-8">
-        {#if images}
-          {#each images as { url }, index}
-            <Img
-              {imgClass}
-              src={url.startsWith('https://') ? url : getPublicUrl(url)}
-              alt={String(index)}
-              shadow="md"
-            />
-          {/each}
-        {/if}
-
-        {#if filePreviews}
-          {#each filePreviews as { src, alt }}
-            <Img {imgClass} {src} {alt} shadow="md" />
-          {/each}
-        {/if}
-      </div>
-    {/snippet}
-
-    {#if memoData?.images[0]?.url}
-      {@render imageSection('text-green-700', '등록된 이미지', memoData?.images, undefined)}
-    {/if}
-
-    {#if !isEmpty($filePreviews)}
-      {@render imageSection(
-        clsx(memoData ? 'text-red-700' : 'text-green-700'),
-        `${actionMap($modalProps?.action).imageLabel}할 이미지`,
-        undefined,
-        $filePreviews,
-      )}
-    {/if}
 
     <div class="mt-5 flex items-center justify-between">
       <Button color="dark" onclick={imageModalUi.toggle}><ImageSolid /></Button>
@@ -149,6 +104,6 @@
   </div>
 </Modal>
 
-{#if modalStatus}
+{#if imageModalUi.isOpen}
   <SetImage {imageModalUi} {selectedFiles} {filePreviews} />
 {/if}

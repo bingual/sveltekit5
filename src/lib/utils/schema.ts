@@ -10,7 +10,7 @@ export const imageFilesSchema = z
     }),
   )
   .superRefine((files, ctx) => {
-    if (files.length === 0) {
+    if (files.length <= 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: '파일을 최소 1개 업로드해야 합니다.',

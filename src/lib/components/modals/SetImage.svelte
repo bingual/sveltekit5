@@ -5,7 +5,7 @@
   import { useContext } from '$lib/utils/stores';
 
   import clsx from 'clsx';
-  import { forEach, isEmpty, map } from 'remeda';
+  import { isEmpty, map } from 'remeda';
   import type { Writable } from 'svelte/store';
   import { Button, Fileupload, Helper, Img, Modal, uiHelpers } from 'svelte-5-ui-lib';
 
@@ -41,6 +41,11 @@
   let helperMessage = $state('지원 확장자: jpg, jpeg, png / 최대 크기: 50MB');
 
   const handleConfirm = () => {
+    if (!selectedFiles) {
+      errors = [{ field: 'images', message: '파일을 최소 1개 업로드해야 합니다.' }];
+      return;
+    }
+
     if (isValid) {
       parentSelectedFiles.set(selectedFiles);
       parentFilePreviews.set(filePreviews);
@@ -52,9 +57,8 @@
     }
   };
 
+  // TODO: 이미지 허용 크기 규격 정하는것도 좋을것 같음
   $effect(() => {
-    modalStatus = imageModalUi.isOpen;
-
     if (selectedFiles) {
       const imageValidation = imageFilesSchema.safeParse(Array.from(selectedFiles));
 
@@ -76,13 +80,10 @@
           : [];
       }
     }
+  });
 
-    return () => {
-      if (!isEmpty(filePreviews)) {
-        forEach(filePreviews, (file) => URL.revokeObjectURL(file.src));
-        filePreviews = [];
-      }
-    };
+  $effect(() => {
+    modalStatus = imageModalUi.isOpen;
   });
 </script>
 

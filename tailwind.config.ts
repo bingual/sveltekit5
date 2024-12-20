@@ -7,7 +7,7 @@ import type { Config } from 'tailwindcss';
 
 export default {
   content: [
-    './src/**/*.{html,js,svelte,ts}',
+    './src/**/*.{html,js,svelte,ts,scss}',
     './node_modules/svelte-5-ui-lib/**/*.{html,js,svelte,ts}',
     './node_modules/flowbite-svelte-icons/**/*.{html,js,svelte,ts}',
   ],
@@ -15,16 +15,15 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#FFF5F2',
-          100: '#FFF1EE',
-          200: '#FFE4DE',
-          300: '#FFD5CC',
-          400: '#FFBCAD',
-          500: '#FE795D',
-          600: '#EF562F',
-          700: '#EB4F27',
-          800: '#CC4522',
-          900: '#A5371B',
+          100: '#CABFFF',
+          200: '#B5A8F7',
+          300: '#A08FE0',
+          400: '#8A75C9',
+          500: '#755CB2',
+          600: '#60429B',
+          700: '#4B2884',
+          800: '#351F66',
+          900: '#241548',
         },
       },
     },

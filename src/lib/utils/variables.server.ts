@@ -1,6 +1,7 @@
 import { PUBLIC_SUPABASE_BUCKET } from '$env/static/public';
 import { supabase } from '$lib/supabaseClient';
 
+import { map, pipe, reduce } from 'remeda';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -47,4 +48,30 @@ export const storageManager = () => {
     uploadPublicStorage,
     removePublicStorageFile,
   };
+};
+
+export const replaceBlobImageSrc = (content: string, uploadResults: string[]) => {
+  const getPublicUrl = (url: string) => {
+    return supabase.storage.from(PUBLIC_SUPABASE_BUCKET).getPublicUrl(url).data.publicUrl;
+  };
+
+  const imgTagRegex = /<img\b[^>]*?\bsrc=["'](blob:.*?)["'][^>]*?>/gi;
+
+  const matches = Array.from(content.matchAll(imgTagRegex));
+
+  return pipe(
+    matches,
+    map((match, index) => {
+      const [fullMatch, blobSrc] = match;
+      const newSrc = getPublicUrl(uploadResults[index]);
+
+      return newSrc
+        ? { original: fullMatch, updated: fullMatch.replace(blobSrc, newSrc) }
+        : { original: fullMatch, updated: fullMatch };
+    }),
+    reduce(
+      (updatedContent, { original, updated }) => updatedContent.replace(original, updated),
+      content,
+    ),
+  );
 };

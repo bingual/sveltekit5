@@ -1,5 +1,5 @@
 import { prisma } from '$lib/prisma';
-import { storageManager } from '$lib/utils/variables.server';
+import { replaceBlobImageSrc, storageManager } from '$lib/utils/variables.server';
 
 import { fail, redirect } from '@sveltejs/kit';
 import { filter, isEmpty, map } from 'remeda';
@@ -123,12 +123,14 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
           ? await Promise.all(map(imageFiles, (file) => uploadPublicStorage(file, '/images/memo')))
           : [];
 
+        const replaceContented = replaceBlobImageSrc(content, uploadResults);
+
         if (actionType === 'create') {
           const createdMemo = await prisma.memo.create({
             data: {
               author: session?.user?.id,
               title: title,
-              content: content,
+              content: replaceContented,
               images: {
                 create: map(uploadResults, (url) => ({
                   url,
@@ -145,36 +147,18 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
             };
           }
         } else if (actionType === 'update') {
-          const memoImages = await prisma.memoImage.findMany({
-            where: {
-              memoId: formValidation.data?.id,
-              Memo: {
-                author: session?.user?.id,
-              },
-            },
-          });
-
-          const urlsToDelete = map(memoImages, (image) => image.url);
-          if (!isEmpty(urlsToDelete)) {
-            await removePublicStorageFile(urlsToDelete);
-          }
+          const replaceContented = replaceBlobImageSrc(content, uploadResults);
 
           const [updatedMemo] = await prisma.$transaction(async (prisma) => {
             const updatedMemo = await prisma.memo.update({
               data: {
                 author: session?.user?.id,
                 title: title,
-                content: content,
+                content: replaceContented,
               },
               where: {
                 author: session?.user?.id,
                 id: id,
-              },
-            });
-
-            const deletedMemoImagesCount = await prisma.memoImage.deleteMany({
-              where: {
-                memoId: formValidation.data?.id,
               },
             });
 
@@ -187,7 +171,7 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
                 })),
               }));
 
-            return [updatedMemo, deletedMemoImagesCount, createdMemoImagesCount];
+            return [updatedMemo, createdMemoImagesCount];
           });
 
           if (updatedMemo.id) {
