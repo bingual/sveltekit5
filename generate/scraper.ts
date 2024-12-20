@@ -65,7 +65,6 @@ export const scrapManager = () => {
 
   return {
     setupBrowser,
-    sleep,
     getEmptyFieldNames,
     scrollToTheBottom,
   };
