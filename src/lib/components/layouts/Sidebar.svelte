@@ -1,6 +1,6 @@
 <script lang="ts">
   import { dev } from '$app/environment';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import clsx from 'clsx';
   import { ChartOutline, CogOutline, LightbulbOutline, PenNibOutline } from 'flowbite-svelte-icons';
@@ -14,9 +14,9 @@
 
   const { sidebarUi }: { sidebarUi: ReturnType<typeof uiHelpers> } = $props();
 
-  const userInfo = $derived($page.data.session?.user);
+  const userInfo = $derived(page.data.session?.user);
 
-  const spanClass = clsx('flex-1 ms-3 whitespace-nowrap');
+  const spanClass = clsx('flex-1 ms-3 whitespace-nowrap xs:text-base text-xs');
   const iconClass = clsx(
     'h-5 w-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white',
   );
@@ -86,7 +86,7 @@
 
 <div class="relative">
   <Sidebar
-    class="top-[61px] z-40 h-full"
+    class="top-[61px] z-40 h-full w-52 @container xs:w-64"
     isSingle={false}
     backdrop={true}
     {isOpen}
@@ -100,12 +100,12 @@
       <SidebarGroup border={section.options[0].border}>
         {#each section.items as item}
           {#if item.children}
-            <SidebarDropdownWrapper label={item.label} btnClass={clsx('p-2')}>
+            <SidebarDropdownWrapper {spanClass} label={item.label} btnClass={clsx('p-2')}>
               {#snippet iconSlot()}
                 <item.icon class={iconClass} />
               {/snippet}
               {#each item.children as child}
-                <SidebarItem label={child.childLabel} href={child.childHref} />
+                <SidebarItem {spanClass} label={child.childLabel} href={child.childHref} />
               {/each}
             </SidebarDropdownWrapper>
           {:else}

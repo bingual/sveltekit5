@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import { SignIn, SignOut } from '@auth/sveltekit/components';
   import clsx from 'clsx';
@@ -21,7 +21,7 @@
     uiHelpers,
   } from 'svelte-5-ui-lib';
 
-  const userInfo = $derived($page.data.session?.user);
+  const userInfo = $derived(page.data.session?.user);
 
   const { sidebarUi }: { sidebarUi: ReturnType<typeof uiHelpers> } = $props();
 
@@ -90,8 +90,8 @@
                   provider="github"
                   signInPage="auth?/signIn"
                   options={{
-                    redirectTo: $page.data.redirectTo
-                      ? `/${decodeURIComponent($page.data.redirectTo).slice(1)}`
+                    redirectTo: page.data.redirectTo
+                      ? `/${decodeURIComponent(page.data.redirectTo).slice(1)}`
                       : `/`,
                   }}
                 >
