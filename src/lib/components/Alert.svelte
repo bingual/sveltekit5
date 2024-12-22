@@ -6,7 +6,7 @@
 </script>
 
 <div class="mb-4">
-  <Alert color="red" class="!items-start">
+  <Alert id="alert" color="red" class="!items-start">
     {#snippet icon()}
       <InfoCircleSolid class="h-5 w-5" />
     {/snippet}

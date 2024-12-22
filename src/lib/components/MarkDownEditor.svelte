@@ -227,39 +227,39 @@
   ];
 </script>
 
-<Label class="my-2 space-y-2"><span>내용</span></Label>
-{#if $editor}
-  <div class="flex items-center space-x-2">
-    {#each buttonGroups as group, groupIndex}
-      {#if groupIndex > 0}
-        <div class="mx-2 h-5 border-l border-gray-300"></div>
-      {/if}
+<div class="@container">
+  <Label class="my-2 space-y-2"><span>내용</span></Label>
+  {#if $editor}
+    <div class="flex items-center space-x-4 space-y-1">
+      {#each buttonGroups as group}
+        <div class="flex flex-wrap gap-1">
+          {#each group.buttons as btn}
+            <div>
+              <button
+                type="button"
+                id={btn.name}
+                class={clsx(
+                  'flex items-center justify-center rounded p-1',
+                  btn.check && btn.check()
+                    ? 'bg-black text-white hover:bg-gray-800'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-black',
+                )}
+                onclick={() => btn.action && btn.action()}
+                aria-label={btn.name}
+              >
+                <Icon src={btn.icon} size="20" />
+              </button>
 
-      <div class="flex space-x-1">
-        {#each group.buttons as btn}
-          <button
-            type="button"
-            id={btn.name}
-            class={clsx(
-              'flex items-center justify-center rounded p-1',
-              btn.check && btn.check()
-                ? 'bg-black text-white hover:bg-gray-800'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-black',
-            )}
-            onclick={() => btn.action && btn.action()}
-            aria-label={btn.name}
-          >
-            <Icon src={btn.icon} size="20" />
-          </button>
-          <!-- FIXME: 중간에 공백 들어가면 인식을 못하는 버그 있음-->
-          <Tooltip class="text-xs" offset={6} triggeredBy={`#${btn.name}`} position="bottom"
-            >{btn.name}</Tooltip
-          >
-        {/each}
-      </div>
-    {/each}
-  </div>
-{/if}
+              <Tooltip class="text-xs" offset={6} triggeredBy={`#${btn.name}`} position="bottom"
+                >{btn.name}</Tooltip
+              >
+            </div>
+          {/each}
+        </div>
+      {/each}
+    </div>
+  {/if}
+</div>
 
 <div class="my-5 @container">
   <EditorContent class="prose prose-lg" editor={$editor} />

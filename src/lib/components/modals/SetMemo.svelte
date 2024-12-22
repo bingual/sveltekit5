@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import { goto } from '$app/navigation';
   import Alert from '$lib/components/Alert.svelte';
   import MarkDownEditor from '$lib/components/MarkDownEditor.svelte';
   import SetImage from '$lib/components/modals/SetImage.svelte';
@@ -38,6 +39,7 @@
         const validRes = result.data as ValidationResponse;
         if (!validRes?.success && !isEmpty(validRes.errors)) {
           errors = validRes.errors;
+          await goto('#alert');
         }
       } else {
         await update();

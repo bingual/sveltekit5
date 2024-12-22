@@ -26,6 +26,9 @@ export default {
           900: '#241548',
         },
       },
+      screens: {
+        xs: '480px',
+      },
     },
   },
   corePlugins: {

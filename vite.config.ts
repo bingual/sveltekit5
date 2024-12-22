@@ -12,6 +12,10 @@ export default defineConfig({
       outdir: './src/lib/paraglide',
     }),
   ],
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+  },
 
   css: {
     preprocessorOptions: {

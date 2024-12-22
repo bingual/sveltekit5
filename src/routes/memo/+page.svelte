@@ -79,7 +79,7 @@
   });
 </script>
 
-<div class="mx-auto @container">
+<div class="mx-auto min-h-screen @container">
   <SearchBar {items} />
 
   {#if !isMemos}
@@ -149,7 +149,7 @@
   {/if}
 
   <!-- 플로팅 -->
-  <div class="fixed bottom-12 right-5 z-50">
+  <div class="fixed bottom-48 right-0 z-40 xs:bottom-12 xs:right-5">
     <Button size="sm" shadow onclick={() => handleModal('create')}>
       <PenNibOutline size="xl" />
     </Button>

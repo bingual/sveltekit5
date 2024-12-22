@@ -86,9 +86,9 @@
 
 <div class="relative">
   <Sidebar
-    class="top-[61px] z-50 h-full"
+    class="top-[61px] z-40 h-full"
     isSingle={false}
-    backdrop={false}
+    backdrop={true}
     {isOpen}
     closeSidebar={closeDemoSidebar}
     params={{ x: -50, duration: 50 }}
