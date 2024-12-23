@@ -29,6 +29,10 @@ export default {
       screens: {
         xs: '480px',
       },
+      inset: {
+        'safe-bottom': 'env(safe-area-inset-bottom)',
+        'safe-right': 'env(safe-area-inset-right)',
+      },
     },
   },
   corePlugins: {

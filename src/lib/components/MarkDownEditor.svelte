@@ -227,7 +227,7 @@
   ];
 </script>
 
-<div class="@container">
+<div>
   <Label class="my-2 space-y-2"><span>내용</span></Label>
   {#if $editor}
     <div class="flex items-center space-x-4 space-y-1">
@@ -261,6 +261,6 @@
   {/if}
 </div>
 
-<div class="my-5 @container">
+<div class="my-5">
   <EditorContent class="prose prose-lg" editor={$editor} />
 </div>

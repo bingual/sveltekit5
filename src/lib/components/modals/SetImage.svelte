@@ -51,13 +51,12 @@
       parentFilePreviews.set(filePreviews);
 
       if (selectedFiles) {
-        addToast('임시 이미지를 등록하였습니다.');
+        addToast('임시 이미지를 등록하였습니다.', 'green');
       }
       closeModal();
     }
   };
 
-  // TODO: 이미지 허용 크기 규격 정하는것도 좋을것 같음
   $effect(() => {
     if (selectedFiles) {
       const imageValidation = imageFilesSchema.safeParse(Array.from(selectedFiles));

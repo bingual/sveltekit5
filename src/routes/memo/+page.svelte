@@ -7,6 +7,8 @@
   import { getPublicUrl } from '$lib/utils/variables';
   import { generateNoDataMessage, useLoadMore } from '$lib/utils/variables.svelte';
 
+  import { Render } from '@jill64/svelte-sanitize';
+  import { sanitize } from '@jill64/universal-sanitizer';
   import type { Memo } from '@prisma/client';
   import { EditOutline, PenNibOutline, TrashBinOutline } from 'flowbite-svelte-icons';
   import { isEmpty } from 'remeda';
@@ -57,8 +59,15 @@
   const handleDelete: SubmitFunction = ({ cancel }) => {
     if (confirm('정말 삭제하시겠습니까?')) {
       isLoading.set(true);
-      return async ({ update }) => {
-        await update();
+      return async ({ result, update }) => {
+        if (result.type === 'failure') {
+          const validRes = result.data as ValidationResponse;
+          if (!validRes?.success && !isEmpty(validRes.errors)) {
+            addToast(validRes?.errors.join('\n'));
+          }
+        } else {
+          await update();
+        }
         isLoading.set(false);
       };
     } else {
@@ -66,16 +75,27 @@
     }
   };
 
+  const contentExtraction = (memo: Memo) => {
+    return sanitize(memo.content, {
+      dompurify: {
+        ALLOWED_TAGS: ['h1', 'h2', 'h3', 'p'],
+        ALLOWED_ATTR: [],
+      },
+    });
+  };
+
+  $effect(() => {
+    isMemos = isEmpty(data.memos);
+    noDataMessage = generateNoDataMessage();
+  });
+
   $effect(() => {
     if (form?.success) {
       const title = `'${form.data?.title}'`;
       const action = actionMap(form.action).toastLabel;
       const toastMessage = `${title}을 ${action}하였습니다.`;
-      addToast(toastMessage);
+      addToast(toastMessage, form.action === 'delete' ? 'red' : 'green');
     }
-
-    isMemos = isEmpty(data.memos);
-    noDataMessage = generateNoDataMessage();
   });
 </script>
 
@@ -103,8 +123,8 @@
         >
           <div class="prose pb-16 lg:prose-lg xl:prose-xl">
             <h3 class="line-clamp-2">{memo.title}</h3>
-            <!-- TODO: 나중에 내용 적당히 자를 수 있는 방법 적용해야함 -->
-            <!--            <p class="line-clamp-4"><Render html={memo.content} /></p>-->
+
+            <p class="line-clamp-4"><Render html={contentExtraction(memo)} /></p>
           </div>
 
           <div class="absolute bottom-3 left-3 flex gap-x-2 p-3">
@@ -149,7 +169,9 @@
   {/if}
 
   <!-- 플로팅 -->
-  <div class="fixed bottom-48 right-0 z-40 xs:bottom-12 xs:right-5">
+  <div
+    class="fixed bottom-[calc(12px+theme(inset.safe-bottom))] right-[calc(5px+theme(inset.safe-right))] z-40"
+  >
     <Button size="sm" shadow onclick={() => handleModal('create')}>
       <PenNibOutline size="xl" />
     </Button>

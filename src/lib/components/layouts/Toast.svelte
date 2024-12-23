@@ -12,6 +12,7 @@
   {#if $toasts && $toasts.length > 0}
     {#each $toasts as toast (toast.id)}
       <Toast
+        color={toast.color}
         class="rounded-lg border border-primary-600"
         dismissable={false}
         toastStatus={toast.status}

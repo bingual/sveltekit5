@@ -1,9 +1,9 @@
 import { localStorageManager } from '$lib/utils/variables.js';
 
-import { filter, forEach, map } from 'remeda';
+import { filter, forEach, isEmpty, map } from 'remeda';
 import { getContext } from 'svelte';
 import { get, type Writable, writable } from 'svelte/store';
-import { uiHelpers } from 'svelte-5-ui-lib';
+import { type ColorType, uiHelpers } from 'svelte-5-ui-lib';
 
 const persistentStore = (key: string, startValue: any) => {
   const { loadFromLocalStorage, saveToLocalStorage } = localStorageManager();
@@ -22,15 +22,17 @@ export const toastStore = () => {
   type Toast = {
     id: number;
     message: string;
+    color?: Exclude<ColorType, 'secondary'>;
     counter: number;
     status: boolean;
   };
 
   const toasts: Writable<Toast[]> = persistentStore('toasts', []);
 
-  const addToast = (message: string, counter = 4) => {
+  const addToast = (message: string, color?: Exclude<ColorType, 'secondary'>, counter = 4) => {
     const id = Date.now();
-    toasts?.update((toasts) => [...toasts, { id, message, counter, status: true }]);
+
+    toasts?.update((toasts) => [...toasts, { id, message, color, counter, status: true }]);
     decrementCounter(id);
   };
 
@@ -54,11 +56,13 @@ export const toastStore = () => {
   const restoreCounters = () => {
     const currentToasts = get(toasts);
 
-    forEach(currentToasts, (toast) => {
-      if (toast.status && toast.counter > 0) {
-        decrementCounter(toast.id);
-      }
-    });
+    if (!isEmpty(currentToasts)) {
+      forEach(currentToasts, (toast) => {
+        if (toast.status && toast.counter > 0) {
+          decrementCounter(toast.id);
+        }
+      });
+    }
   };
 
   const removeToast = (id: number) => {
