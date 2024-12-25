@@ -45,16 +45,14 @@ export const actions = {
 
       const lists = `<ul>${listItems}</ul>`;
 
-      const imgUrls = pipe(
+      const imageUrls = pipe(
         range(0, faker.number.int({ min: 1, max: 8 })),
-        map(() => ({
-          url: faker.image.url({ width: 400, height: 400 }),
-        })),
+        map(() => faker.image.url({ width: 400, height: 400 })),
       );
 
       const imgTags = pipe(
-        imgUrls,
-        map((value, index) => `<img src="${value.url}" alt="Image ${index + 1}" />`),
+        imageUrls,
+        map((imageUrl, index) => `<img src="${imageUrl}" alt="Image ${index + 1}" />`),
         join('\n'),
       );
 
@@ -66,20 +64,20 @@ export const actions = {
       ${lists}
       ${imgTags}
     `,
-        imgUrls: imgUrls,
+        imageUrls: imageUrls,
       };
     };
 
     const fakeMemos = pipe(
       range(0, totalCount),
       map((index) => {
-        const { content, imgUrls } = generateRandomHtml();
+        const { content, imageUrls } = generateRandomHtml();
         return {
           author: session?.user?.id,
           title: faker.lorem.sentence(),
           content: content,
           created_at: new Date(now.getTime() - index * 1000),
-          memoImages: map(imgUrls, (value) => value.url),
+          memoImages: imageUrls,
         };
       }),
     );
@@ -102,9 +100,9 @@ export const actions = {
         flatMap((memo, memoIndex) =>
           pipe(
             fakeMemos[memoIndex].memoImages,
-            map((imgUrl) => ({
+            map((imageUrl) => ({
               memoId: memo.id,
-              url: imgUrl,
+              url: imageUrl,
             })),
           ),
         ),
