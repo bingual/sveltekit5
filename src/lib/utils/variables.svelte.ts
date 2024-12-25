@@ -23,6 +23,7 @@ export const useLoadMore = () => {
     loadMoreData,
   };
 };
+
 export const generateNoDataMessage = () => {
   const url = page.url;
   return url.searchParams.size > 0 ? '일치하는 데이터가 없습니다.' : '데이터가 존재하지 않습니다.';

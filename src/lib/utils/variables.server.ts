@@ -10,9 +10,21 @@ export const storageManager = () => {
     return fileName.slice(((fileName.lastIndexOf('.') - 1) >>> 0) + 2);
   };
 
-  const imageOptimizer = async (file: File) => {
+  const getPublicUrls = (urls: string[]) => {
+    return map(urls, (url) => {
+      return supabase.storage.from(PUBLIC_SUPABASE_BUCKET).getPublicUrl(url).data.publicUrl;
+    });
+  };
+
+  const imageOptimizer = async (
+    file: File,
+    options = { width: 400, height: 400, quality: 100 },
+  ) => {
     const inputBuffer = Buffer.from(await file.arrayBuffer());
-    return await sharp(inputBuffer).resize(400, 400).webp({ quality: 100 }).toBuffer();
+    return await sharp(inputBuffer)
+      .resize(options.width, options.height)
+      .webp({ quality: options.quality })
+      .toBuffer();
   };
 
   const uploadPublicStorage = async (file: File, dir: string) => {
@@ -44,34 +56,33 @@ export const storageManager = () => {
     return data;
   };
 
+  const replaceBlobImageSrc = (content: string, uploadResults: string[]) => {
+    const imgTagRegex = /<img\b[^>]*?\bsrc=["'](blob:.*?)["'][^>]*?>/gi;
+
+    const matches = Array.from(content.matchAll(imgTagRegex));
+
+    return pipe(
+      matches,
+      map((match, index) => {
+        const [fullMatch, blobSrc] = match;
+        const newSrc = uploadResults[index];
+
+        return newSrc
+          ? { original: fullMatch, updated: fullMatch.replace(blobSrc, newSrc) }
+          : { original: fullMatch, updated: fullMatch };
+      }),
+      reduce(
+        (updatedContent, { original, updated }) => updatedContent.replace(original, updated),
+        content,
+      ),
+    );
+  };
+
   return {
+    getPublicUrls,
+    imageOptimizer,
     uploadPublicStorage,
     removePublicStorageFile,
+    replaceBlobImageSrc,
   };
-};
-
-export const replaceBlobImageSrc = (content: string, uploadResults: string[]) => {
-  const getPublicUrl = (url: string) => {
-    return supabase.storage.from(PUBLIC_SUPABASE_BUCKET).getPublicUrl(url).data.publicUrl;
-  };
-
-  const imgTagRegex = /<img\b[^>]*?\bsrc=["'](blob:.*?)["'][^>]*?>/gi;
-
-  const matches = Array.from(content.matchAll(imgTagRegex));
-
-  return pipe(
-    matches,
-    map((match, index) => {
-      const [fullMatch, blobSrc] = match;
-      const newSrc = getPublicUrl(uploadResults[index]);
-
-      return newSrc
-        ? { original: fullMatch, updated: fullMatch.replace(blobSrc, newSrc) }
-        : { original: fullMatch, updated: fullMatch };
-    }),
-    reduce(
-      (updatedContent, { original, updated }) => updatedContent.replace(original, updated),
-      content,
-    ),
-  );
 };
