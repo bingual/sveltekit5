@@ -3,7 +3,7 @@ import { storageManager } from '$lib/utils/variables.server';
 
 import { faker } from '@faker-js/faker/locale/en';
 import { redirect } from '@sveltejs/kit';
-import { isEmpty, join, map, pipe, range } from 'remeda';
+import { flatMap, isEmpty, join, map, omit, pipe, range } from 'remeda';
 
 import type { Actions } from './$types';
 
@@ -79,32 +79,47 @@ export const actions = {
           title: faker.lorem.sentence(),
           content: content,
           created_at: new Date(now.getTime() - index * 1000),
-          images: map(imgUrls, (value) => ({ url: value.url })),
+          memoImages: map(imgUrls, (value) => value.url),
         };
       }),
     );
 
-    const createdMemos = await Promise.all(
-      map(fakeMemos, async (memo) => {
-        return prisma.memo.create({
-          data: {
-            author: memo.author,
-            title: memo.title,
-            content: memo.content,
-            created_at: memo.created_at,
-            images: {
-              create: memo.images,
-            },
-          },
-        });
-      }),
-    );
+    const [createdMemosCount] = await prisma.$transaction(async (prisma) => {
+      const createdMemosCount = await prisma.memo.createMany({
+        data: map(fakeMemos, (fakeMemo) => omit(fakeMemo, ['memoImages'])),
+        skipDuplicates: true,
+      });
 
-    if (createdMemos.length > 0) {
+      const createdMemos = await prisma.memo.findMany({
+        select: { id: true },
+        where: { author: session?.user?.id },
+        orderBy: { created_at: 'desc' },
+        take: createdMemosCount.count,
+      });
+
+      const createdImages = pipe(
+        createdMemos,
+        flatMap((memo, memoIndex) =>
+          pipe(
+            fakeMemos[memoIndex].memoImages,
+            map((imgUrl) => ({
+              memoId: memo.id,
+              url: imgUrl,
+            })),
+          ),
+        ),
+      );
+
+      const fakeImagesCount = await prisma.memoImage.createMany({ data: createdImages });
+
+      return [createdMemosCount, createdImages, fakeImagesCount];
+    });
+
+    if (createdMemosCount.count > 0) {
       return {
         success: true,
         action: 'create' as ActionType,
-        data: createdMemos.length,
+        data: createdMemosCount.count,
       };
     }
   },
@@ -114,9 +129,10 @@ export const actions = {
     if (!session?.user?.id) {
       return redirect(302, '/');
     }
+
     const memoImages = await prisma.memoImage.findMany({
       where: {
-        Memo: {
+        memo: {
           author: session?.user?.id,
         },
       },

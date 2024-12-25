@@ -81,7 +81,7 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
         const memoImages = await prisma.memoImage.findMany({
           where: {
             memoId: formValidation.data?.id,
-            Memo: {
+            memo: {
               author: session?.user?.id,
             },
           },
