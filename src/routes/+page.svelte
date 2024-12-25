@@ -1,8 +1,9 @@
 <script lang="ts">
+  import DashBoard from '$lib/markdowns/DashBoard.md';
 </script>
 
 <div class="mx-auto @container">
-  <div class="prose lg:prose-xl">
-    <h1>SVELTEKIT TEST</h1>
+  <div class="prose prose-sm max-w-none xs:prose-base lg:prose-lg">
+    <DashBoard />
   </div>
 </div>

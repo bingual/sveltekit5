@@ -3,7 +3,7 @@ import { storageManager } from '$lib/utils/variables.server';
 
 import { faker } from '@faker-js/faker/locale/en';
 import { redirect } from '@sveltejs/kit';
-import { isEmpty, map } from 'remeda';
+import { isEmpty, join, map, pipe, range } from 'remeda';
 
 import type { Actions } from './$types';
 
@@ -21,43 +21,90 @@ export const actions = {
     const totalCount = Number(count) || 1;
     const now = new Date();
 
-    const fakeMemos = Array.from({ length: totalCount }, (_, index) => ({
-      author: session?.user?.id,
-      title: faker.lorem.sentence(),
-      content: faker.lorem.paragraphs(3),
-      created_at: new Date(now.getTime() - index * 1000),
-    }));
+    const generateRandomHtml = () => {
+      const headings = pipe(
+        range(0, faker.number.int({ min: 1, max: 3 })),
+        map(() => {
+          const headingLevel = faker.number.int({ min: 1, max: 3 });
+          return `<h${headingLevel}>${faker.lorem.sentence()}</h${headingLevel}>`;
+        }),
+        join(''),
+      );
 
-    const [createdMemosCount] = await prisma.$transaction(async (prisma) => {
-      const createdMemosCount = await prisma.memo.createMany({
-        data: fakeMemos,
-        skipDuplicates: true,
-      });
+      const paragraphs = pipe(
+        range(0, faker.number.int({ min: 2, max: 5 })),
+        map(() => `<p>${faker.lorem.paragraph()}</p>`),
+        join(''),
+      );
 
-      const createdMemos = await prisma.memo.findMany({
-        where: { author: session?.user?.id },
-        orderBy: { created_at: 'desc' },
-        take: createdMemosCount.count,
-      });
+      const listItems = pipe(
+        range(0, faker.number.int({ min: 3, max: 7 })),
+        map(() => `<li>${faker.lorem.sentence()}</li>`),
+        join(''),
+      );
 
-      const fakeImages = createdMemos.flatMap((memo) => {
-        const imageCount = faker.number.int({ min: 1, max: 8 });
-        return Array.from({ length: imageCount }, () => ({
-          memoId: memo.id,
+      const lists = `<ul>${listItems}</ul>`;
+
+      const imgUrls = pipe(
+        range(0, faker.number.int({ min: 1, max: 8 })),
+        map(() => ({
           url: faker.image.url({ width: 400, height: 400 }),
-        }));
-      });
+        })),
+      );
 
-      const fakeImagesCount = await prisma.memoImage.createMany({ data: fakeImages });
+      const imgTags = pipe(
+        imgUrls,
+        map((value, index) => `<img src="${value.url}" alt="Image ${index + 1}" />`),
+        join('\n'),
+      );
 
-      return [createdMemosCount, createdMemos, fakeImagesCount];
-    });
+      // 조합된 HTML 반환
+      return {
+        content: `
+      ${headings}
+      ${paragraphs}
+      ${lists}
+      ${imgTags}
+    `,
+        imgUrls: imgUrls,
+      };
+    };
 
-    if (createdMemosCount.count > 0) {
+    const fakeMemos = pipe(
+      range(0, totalCount),
+      map((index) => {
+        const { content, imgUrls } = generateRandomHtml();
+        return {
+          author: session?.user?.id,
+          title: faker.lorem.sentence(),
+          content: content,
+          created_at: new Date(now.getTime() - index * 1000),
+          images: map(imgUrls, (value) => ({ url: value.url })),
+        };
+      }),
+    );
+
+    const createdMemos = await Promise.all(
+      map(fakeMemos, async (memo) => {
+        return prisma.memo.create({
+          data: {
+            author: memo.author,
+            title: memo.title,
+            content: memo.content,
+            created_at: memo.created_at,
+            images: {
+              create: memo.images,
+            },
+          },
+        });
+      }),
+    );
+
+    if (createdMemos.length > 0) {
       return {
         success: true,
         action: 'create' as ActionType,
-        data: createdMemosCount,
+        data: createdMemos.length,
       };
     }
   },
@@ -92,7 +139,7 @@ export const actions = {
       return {
         success: true,
         action: 'delete' as ActionType,
-        data: memoDeleted,
+        data: memoDeleted.count,
       };
     }
   },

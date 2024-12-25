@@ -12,7 +12,7 @@
   import type { Memo } from '@prisma/client';
   import { EditOutline, PenNibOutline, TrashBinOutline } from 'flowbite-svelte-icons';
   import { isEmpty } from 'remeda';
-  import { Button, Card, Heading, Input } from 'svelte-5-ui-lib';
+  import { Button, Card, Heading, Input, P } from 'svelte-5-ui-lib';
 
   import type { ActionData, PageData, SubmitFunction } from './$types';
 
@@ -75,13 +75,16 @@
     }
   };
 
-  const contentExtraction = (memo: Memo) => {
-    return sanitize(memo.content, {
+  const contentExtraction = (memo: Memo): string => {
+    const sanitizedContent = sanitize(memo.content, {
       dompurify: {
         ALLOWED_TAGS: ['h1', 'h2', 'h3', 'p'],
         ALLOWED_ATTR: [],
       },
     });
+
+    const plainText = sanitizedContent.replace(/<\/?[^>]+(>|$)/g, ' ');
+    return plainText.replace(/[\r\n]+/g, ' ').trim();
   };
 
   $effect(() => {
@@ -121,10 +124,12 @@
                 alt: memo.title,
               }}
         >
-          <div class="prose pb-16 lg:prose-lg xl:prose-xl">
-            <h3 class="line-clamp-2">{memo.title}</h3>
+          <div class="pb-16">
+            <Heading class="mb-5 line-clamp-2 whitespace-pre-line" tag="h3">{memo.title}</Heading>
 
-            <p class="line-clamp-4"><Render html={contentExtraction(memo)} /></p>
+            <P class="line-clamp-4 whitespace-pre-line">
+              <Render html={contentExtraction(memo)} />
+            </P>
           </div>
 
           <div class="absolute bottom-3 left-3 flex gap-x-2 p-3">

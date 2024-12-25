@@ -1,5 +1,5 @@
 import { prisma } from '$lib/prisma';
-import { replaceBlobImageSrc, storageManager } from '$lib/utils/variables.server';
+import { storageManager } from '$lib/utils/variables.server';
 
 import { fail, redirect } from '@sveltejs/kit';
 import { filter, isEmpty, map } from 'remeda';
@@ -7,7 +7,8 @@ import { filter, isEmpty, map } from 'remeda';
 import type { Actions, PageServerLoad } from './$types';
 import { formDataSchema } from './schema';
 
-const { removePublicStorageFile, uploadPublicStorage } = storageManager();
+const { getPublicUrls, removePublicStorageFile, uploadPublicStorage, replaceBlobImageSrc } =
+  storageManager();
 
 export const load: PageServerLoad = async ({ parent, url }) => {
   const { session } = await parent();
@@ -123,7 +124,7 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
           ? await Promise.all(map(imageFiles, (file) => uploadPublicStorage(file, '/images/memo')))
           : [];
 
-        const replaceContented = replaceBlobImageSrc(content, uploadResults);
+        const replaceContented = replaceBlobImageSrc(content, getPublicUrls(uploadResults));
 
         if (actionType === 'create') {
           const createdMemo = await prisma.memo.create({
@@ -147,7 +148,7 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
             };
           }
         } else if (actionType === 'update') {
-          const replaceContented = replaceBlobImageSrc(content, uploadResults);
+          const replaceContented = replaceBlobImageSrc(content, getPublicUrls(uploadResults));
 
           const [updatedMemo] = await prisma.$transaction(async (prisma) => {
             const updatedMemo = await prisma.memo.update({

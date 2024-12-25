@@ -9,6 +9,7 @@
   import Underline from '@tiptap/extension-underline';
   import StarterKit from '@tiptap/starter-kit';
   import clsx from 'clsx';
+  import { map } from 'remeda';
   import type { Readable, Writable } from 'svelte/store';
   import { Label, Tooltip } from 'svelte-5-ui-lib';
   import {
@@ -70,7 +71,7 @@
   });
 
   $effect(() => {
-    const urls = $parentFilePreviews.map(({ src }) => src);
+    const urls = map($parentFilePreviews, ({ src }) => src);
 
     if (
       urls.length === lastProcessedUrls.length &&
@@ -85,7 +86,7 @@
 
   const addImagesAsBlock = async (urls: string[]) => {
     if (urls.length > 0) {
-      const imageHTML = urls.map((url) => `<img src="${url}" alt="" >`).join('<br/>');
+      const imageHTML = map(urls, (url) => `<img src="${url}" alt="" >`).join('<br/>');
 
       $editor.chain().focus().insertContent(imageHTML).run();
 
@@ -262,5 +263,5 @@
 </div>
 
 <div class="my-5">
-  <EditorContent class="prose prose-lg" editor={$editor} />
+  <EditorContent class="prose prose-sm max-w-none xs:prose-base" editor={$editor} />
 </div>

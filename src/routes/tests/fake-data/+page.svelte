@@ -26,7 +26,7 @@
 
   $effect(() => {
     if (form?.success) {
-      const count = `'${form.data.count}'`;
+      const count = `'${form.data}'`;
       const action = actionMap(form.action).toastLabel;
       const toastMessage = `메모를 ${count}개 ${action}하였습니다.`;
       addToast(toastMessage, form.action === 'delete' ? 'red' : 'green');
