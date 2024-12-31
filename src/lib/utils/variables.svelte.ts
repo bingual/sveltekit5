@@ -2,24 +2,26 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
 
-export const useLoadMore = () => {
-  const key = 'take';
-  const interval = 20;
-  const url = page.url;
+import { get, writable } from 'svelte/store';
+
+export const useLoadMore = (interval = 20) => {
+  const key = $state('take');
+  const url = $state(page.url);
+
   const getTake = $derived(Number(page.url.searchParams.get(key)) || interval);
+  const currentTake = writable(interval);
 
   const loadMoreData = async () => {
     if (!browser) return;
 
-    const currentTake = getTake + interval;
-
-    url.searchParams.set(key, String(currentTake));
+    currentTake.set(getTake + interval);
+    url.searchParams.set(key, String(get(currentTake)));
     await goto(url.toString(), { replaceState: true, noScroll: true });
   };
 
   return {
     interval,
-    currentTake: getTake,
+    currentTake,
     loadMoreData,
   };
 };

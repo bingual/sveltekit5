@@ -3,13 +3,12 @@
   import { goto } from '$app/navigation';
   import SearchBar from '$lib/components/SearchBar.svelte';
   import { actionMap } from '$lib/utils/mapping';
+  import type { MemoWithImages } from '$lib/utils/prismaTypes';
   import { useContext } from '$lib/utils/stores';
   import { getPublicUrl } from '$lib/utils/variables';
   import { generateNoDataMessage, useLoadMore } from '$lib/utils/variables.svelte';
 
   import { Render } from '@jill64/svelte-sanitize';
-  import { sanitize } from '@jill64/universal-sanitizer';
-  import type { Memo } from '@prisma/client';
   import { EditOutline, PenNibOutline, TrashBinOutline } from 'flowbite-svelte-icons';
   import { isEmpty } from 'remeda';
   import { Button, Card, Heading, Input, P } from 'svelte-5-ui-lib';
@@ -26,8 +25,8 @@
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
-  let isMemos = $state(false);
-  let noDataMessage = $state();
+  let isMemos = $derived(isEmpty(data.memos));
+  let noDataMessage = $derived(generateNoDataMessage());
 
   const items = [
     {
@@ -37,7 +36,7 @@
     { name: '내용', value: 'content' },
   ];
 
-  const handleModal = (action: ActionType, memoData?: Memo) => {
+  const handleModal = (action: ActionType, memoData?: MemoWithImages) => {
     const actionMap = {
       create: {
         modalTitle: '메모 생성',
@@ -75,22 +74,25 @@
     }
   };
 
-  const contentExtraction = (memo: Memo): string => {
-    const sanitizedContent = sanitize(memo.content, {
-      dompurify: {
-        ALLOWED_TAGS: ['h1', 'h2', 'h3', 'p'],
-        ALLOWED_ATTR: [],
-      },
-    });
+  const extractPlainText = (content: string) => {
+    if (!content) return '';
 
-    const plainText = sanitizedContent.replace(/<\/?[^>]+(>|$)/g, ' ');
+    const plainText = content.replace(/<\/?[^>]+(>|$)/g, ' ');
     return plainText.replace(/[\r\n]+/g, ' ').trim();
   };
 
-  $effect(() => {
-    isMemos = isEmpty(data.memos);
-    noDataMessage = generateNoDataMessage();
-  });
+  const extractThumbnail = (memo: MemoWithImages) => {
+    if (memo?.images?.[0]?.url) {
+      return memo.images[0].url.startsWith('https://')
+        ? memo.images[0].url
+        : getPublicUrl(memo.images[0].url);
+    }
+
+    const regex = /<img[^>]*src=["']([^"']+)["']/i;
+    const match = memo.content.match(regex);
+
+    return match ? match[1] : '/images/noImage.jpg';
+  };
 
   $effect(() => {
     if (form?.success) {
@@ -102,7 +104,7 @@
   });
 </script>
 
-<div class="mx-auto min-h-screen @container">
+<div class="min-h-screen @container">
   <SearchBar {items} />
 
   {#if !isMemos}
@@ -112,23 +114,16 @@
         <Card
           class="relative"
           size="md"
-          img={memo?.images[0]?.url
-            ? {
-                src: memo.images[0].url.startsWith('https://')
-                  ? memo.images[0].url
-                  : getPublicUrl(memo.images[0].url),
-                alt: memo.title,
-              }
-            : {
-                src: '/images/noImage.jpg',
-                alt: memo.title,
-              }}
+          img={{
+            src: extractThumbnail(memo),
+            alt: memo.title || 'Default Title',
+          }}
         >
           <div class="pb-16">
             <Heading class="mb-5 line-clamp-2 whitespace-pre-line" tag="h3">{memo.title}</Heading>
 
             <P class="line-clamp-4 whitespace-pre-line">
-              <Render html={contentExtraction(memo)} />
+              <Render html={extractPlainText(memo.content)} />
             </P>
           </div>
 
@@ -149,7 +144,7 @@
     {#if data.memoTotalCount > interval}
       <div class="mt-10 grid place-items-center">
         <div class="text-center">
-          {#if data.memoTotalCount > currentTake}
+          {#if data.memoTotalCount > $currentTake}
             <Button class="w-full rounded-none" size="lg" color="dark" onclick={loadMoreData}
               >더 보기</Button
             >
@@ -159,7 +154,7 @@
             {`${data.memoTotalCount}개 목록 중 ${data.memos.length}개를 보셨습니다.`}
           </div>
 
-          {#if data.memoTotalCount <= currentTake}
+          {#if data.memoTotalCount <= $currentTake}
             <div class="mt-2">
               <button class="underline" onclick={async () => await goto('#')}>
                 첫 번째 페이지로 이동

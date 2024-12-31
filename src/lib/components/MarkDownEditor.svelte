@@ -1,14 +1,25 @@
 <script lang="ts">
   import type { MemoWithImages } from '$lib/utils/prismaTypes';
 
+  import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
   import { Color } from '@tiptap/extension-color';
-  import Image from '@tiptap/extension-image';
+  import { Link } from '@tiptap/extension-link';
   import ListItem from '@tiptap/extension-list-item';
   import TextAlign from '@tiptap/extension-text-align';
   import TextStyle from '@tiptap/extension-text-style';
   import Underline from '@tiptap/extension-underline';
   import StarterKit from '@tiptap/starter-kit';
   import clsx from 'clsx';
+  import bash from 'highlight.js/lib/languages/bash';
+  import css from 'highlight.js/lib/languages/css';
+  import java from 'highlight.js/lib/languages/java';
+  import js from 'highlight.js/lib/languages/javascript';
+  import python from 'highlight.js/lib/languages/python';
+  import shell from 'highlight.js/lib/languages/shell';
+  import sql from 'highlight.js/lib/languages/sql';
+  import ts from 'highlight.js/lib/languages/typescript';
+  import html from 'highlight.js/lib/languages/xml';
+  import { createLowlight } from 'lowlight';
   import { map } from 'remeda';
   import type { Readable, Writable } from 'svelte/store';
   import { Label, Tooltip } from 'svelte-5-ui-lib';
@@ -34,6 +45,20 @@
     Underline as UnderlineIcon,
   } from 'svelte-hero-icons';
   import { createEditor, Editor, EditorContent } from 'svelte-tiptap';
+  import ImageResize from 'tiptap-extension-resize-image';
+
+  import 'highlight.js/styles/atom-one-dark.css';
+
+  const lowlight = createLowlight();
+  lowlight.register('html', html);
+  lowlight.register('css', css);
+  lowlight.register('js', js);
+  lowlight.register('ts', ts);
+  lowlight.register('python', python);
+  lowlight.register('java', java);
+  lowlight.register('sql', sql);
+  lowlight.register('bash', bash);
+  lowlight.register('shell', shell);
 
   let {
     memoData,
@@ -46,55 +71,9 @@
   } = $props();
 
   let editor = $state() as Readable<Editor>;
+  let lastProcessedUrls: string[] = $state([]);
 
-  let lastProcessedUrls: string[] = [];
-
-  $effect(() => {
-    editor = createEditor({
-      extensions: [
-        Color.configure({ types: [TextStyle.name, ListItem.name] }),
-        TextStyle.configure({ HTMLAttributes: [ListItem.name] }),
-        TextAlign.configure({ types: ['heading', 'paragraph'] }),
-        Image.configure({
-          HTMLAttributes: {
-            style: 'width: 100%; height: auto;',
-          },
-        }),
-        StarterKit,
-        Underline,
-      ],
-      content: memoData?.content,
-      onUpdate: ({ editor }) => {
-        editorContent.set(editor.getHTML());
-      },
-    });
-  });
-
-  $effect(() => {
-    const urls = map($parentFilePreviews, ({ src }) => src);
-
-    if (
-      urls.length === lastProcessedUrls.length &&
-      urls.every((url, index) => url === lastProcessedUrls[index])
-    ) {
-      return;
-    }
-
-    addImagesAsBlock(urls);
-    lastProcessedUrls = urls;
-  });
-
-  const addImagesAsBlock = async (urls: string[]) => {
-    if (urls.length > 0) {
-      const imageHTML = map(urls, (url) => `<img src="${url}" alt="" >`).join('<br/>');
-
-      $editor.chain().focus().insertContent(imageHTML).run();
-
-      console.log($editor.getHTML());
-    }
-  };
-
-  const buttonGroups = [
+  const buttonGroups = $state([
     {
       groupName: '헤딩',
       buttons: [
@@ -210,7 +189,6 @@
           action: () => $editor?.chain().focus().toggleOrderedList().run(),
           check: () => $editor?.isActive('orderedList'),
         },
-
         {
           name: '인용문',
           icon: BookOpen,
@@ -225,7 +203,116 @@
         },
       ],
     },
-  ];
+  ]);
+
+  const addImagesAsBlock = async (urls: string[]) => {
+    if (urls.length > 0) {
+      const imageHTML = map(urls, (url) => `<img src="${url}" alt="">`).join(' ');
+
+      $editor.chain().focus().insertContent(imageHTML).run();
+    }
+  };
+
+  $effect(() => {
+    editor = createEditor({
+      extensions: [
+        StarterKit.configure({
+          codeBlock: false,
+        }),
+        Underline,
+        Color.configure({ types: [TextStyle.name, ListItem.name] }),
+        TextStyle.configure({ HTMLAttributes: [ListItem.name] }),
+        TextAlign.configure({ types: ['heading', 'paragraph'] }),
+        CodeBlockLowlight.configure({
+          lowlight,
+        }),
+        ImageResize,
+        Link.configure({
+          openOnClick: true,
+          autolink: true,
+          defaultProtocol: 'https',
+          protocols: ['http', 'https'],
+          isAllowedUri: (url, ctx) => {
+            try {
+              // URL 생성
+              const parsedUrl = url.includes(':')
+                ? new URL(url)
+                : new URL(`${ctx.defaultProtocol}://${url}`);
+
+              // 기본 유효성 검사 수행
+              if (!ctx.defaultValidate(parsedUrl.href)) {
+                return false;
+              }
+
+              // 허용되지 않은 프로토콜
+              const disallowedProtocols = ['ftp', 'file', 'mailto'];
+              const protocol = parsedUrl.protocol.replace(':', '');
+
+              if (disallowedProtocols.includes(protocol)) {
+                return false;
+              }
+
+              // ctx.protocols에 지정된 프로토콜만 허용
+              const allowedProtocols = ctx.protocols.map((p) =>
+                typeof p === 'string' ? p : p.scheme,
+              );
+
+              if (!allowedProtocols.includes(protocol)) {
+                return false;
+              }
+
+              // 허용되지 않은 도메인
+              const disallowedDomains = ['example-phishing.com', 'malicious-site.net'];
+              const domain = parsedUrl.hostname;
+
+              if (disallowedDomains.includes(domain)) {
+                return false;
+              }
+
+              // 모든 검사를 통과했음
+              return true;
+            } catch (err) {
+              console.error(err);
+              return false;
+            }
+          },
+          shouldAutoLink: (url) => {
+            try {
+              // URL 생성
+              const parsedUrl = url.includes(':') ? new URL(url) : new URL(`https://${url}`);
+
+              // 도메인이 허용되지 않은 목록에 없는 경우에만 자동 링크 생성
+              const disallowedDomains = ['example-no-autolink.com', 'another-no-autolink.com'];
+              const domain = parsedUrl.hostname;
+
+              return !disallowedDomains.includes(domain);
+            } catch (err) {
+              console.error(err);
+              return false;
+            }
+          },
+        }),
+      ],
+      content: memoData?.content,
+      onUpdate: ({ editor }) => {
+        editorContent.set(editor.getHTML());
+      },
+    });
+  });
+
+  $effect(() => {
+    const urls = map($parentFilePreviews, ({ src }) => src);
+
+    if (
+      urls.length === lastProcessedUrls.length &&
+      urls.every((url, index) => url === lastProcessedUrls[index])
+    ) {
+      return;
+    }
+
+    addImagesAsBlock(urls);
+    lastProcessedUrls = urls;
+  });
 </script>
 
 <div>
@@ -263,5 +350,8 @@
 </div>
 
 <div class="my-5">
-  <EditorContent class="prose prose-sm max-w-none xs:prose-base" editor={$editor} />
+  <EditorContent
+    class="prose prose-sm max-w-none dark:prose-invert xs:prose-base"
+    editor={$editor}
+  />
 </div>
