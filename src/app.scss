@@ -1,6 +1,5 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,28 +10,27 @@
   }
 
   img {
-    @apply block h-auto max-w-full m-0;
+    @apply m-0 block h-auto max-w-full;
   }
 }
 
 .ProseMirror {
-  @apply min-h-[400px] rounded-lg border border-gray-300 dark:border-gray-600 p-2.5 focus:outline-none transition focus:border-2 focus:border-primary-500 focus:ring-primary-500 dark:focus:border-primary-500 bg-gray-50 dark:bg-gray-700;
+  @apply min-h-[400px] rounded-lg border border-gray-300 bg-gray-50 p-2.5 transition focus:border-2 focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:focus:border-primary-500;
 }
-
 
 .prose {
   code {
     &:not(pre code) {
-      @apply bg-gray-100 text-[#1A7E1F] p-1 rounded-md dark:bg-[#00000080] dark:text-[#45BA4B];
+      @apply rounded-md bg-gray-100 p-1 text-[#1A7E1F] dark:bg-[#00000080] dark:text-[#45BA4B];
     }
   }
 
   a {
-    @apply inline-flex items-center no-underline hover:underline text-sky-600 dark:text-sky-500 cursor-pointer;
+    @apply inline-flex cursor-pointer items-center text-sky-600 no-underline hover:underline dark:text-sky-500;
   }
 }
 
 .prose code::before,
 .prose code::after {
-  content: ""; /* 백틱 제거 */
+  content: ''; /* 백틱 제거 */
 }
