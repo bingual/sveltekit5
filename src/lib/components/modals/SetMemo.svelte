@@ -87,7 +87,7 @@
         <div>
           <Label class="mb-2 space-y-2" for="title"><span>제목</span></Label>
           <Input
-            class="text-base dark:text-[#D1D5DB]"
+            class="bg-white text-base dark:bg-gray-900 dark:text-[#D1D5DB]"
             type="text"
             id="title"
             name="title"

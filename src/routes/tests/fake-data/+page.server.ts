@@ -53,7 +53,6 @@ export const actions = {
       const imgTags = pipe(
         imageUrls,
         map((imageUrl, index) => `<img src="${imageUrl}" alt="Image ${index + 1}" />`),
-        join('\n'),
       );
 
       // 조합된 HTML 반환

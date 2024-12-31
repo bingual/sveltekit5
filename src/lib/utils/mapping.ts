@@ -7,7 +7,7 @@ export const actionMap = (value: ActionType = 'create') => {
 
   const imageLabelMap = {
     create: '등록',
-    update: '변경',
+    update: '등록',
   };
 
   const actionType = value || 'create';
