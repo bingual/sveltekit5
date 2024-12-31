@@ -21,9 +21,10 @@ export const load: PageServerLoad = async ({ parent, url }) => {
   const { session } = await parent();
 
   const searchParams = url.searchParams;
+
+  const category = searchParams.get('category') ?? 'all';
+  const query = searchParams.get('query') ?? '';
   const take = Number(searchParams.get('take')) || 20;
-  const category = searchParams.get('category') || 'all';
-  const query = searchParams.get('query') || '';
 
   const [memos, memoTotalCount] = await Promise.all([
     prisma.memo.findMany({
@@ -48,6 +49,14 @@ export const load: PageServerLoad = async ({ parent, url }) => {
     prisma.memo.count({
       where: {
         author: session?.user?.id,
+        ...(query &&
+          category === 'all' && {
+            OR: [{ title: { contains: query } }, { content: { contains: query } }],
+          }),
+        ...(category !== 'all' && query && { [category]: { contains: query } }),
+      },
+      orderBy: {
+        created_at: 'desc',
       },
     }),
   ]);

@@ -21,7 +21,7 @@
     isLoading,
   } = useContext();
 
-  const { interval, currentTake, loadMoreData } = useLoadMore();
+  const { interval, currentTake, loadMoreData, resetTake } = useLoadMore();
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -95,6 +95,10 @@
   };
 
   $effect(() => {
+    resetTake();
+  });
+
+  $effect(() => {
     if (form?.success) {
       const title = `'${form.data?.title}'`;
       const action = actionMap(form.action).toastLabel;
@@ -141,6 +145,7 @@
     </div>
 
     <!-- 페이지네이션 -->
+    {$currentTake}
     {#if data.memoTotalCount > interval}
       <div class="mt-10 grid place-items-center">
         <div class="text-center">

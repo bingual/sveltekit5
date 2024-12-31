@@ -3,7 +3,7 @@ import { supabase } from '$lib/supabaseClient';
 import { MemoWithImages } from '$lib/utils/prismaTypes';
 
 import { sanitize } from '@jill64/universal-sanitizer';
-import { isArray, isEmpty, isString, map, pipe, reduce } from 'remeda';
+import { isArray, isString, map, pipe, reduce } from 'remeda';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -14,7 +14,7 @@ export const storageManager = () => {
         data: { publicUrl },
       } = supabase.storage.from(PUBLIC_SUPABASE_BUCKET).getPublicUrl(url);
 
-      if (isEmpty(publicUrl)) {
+      if (!publicUrl) {
         throw new Error(`해당 URL의 공개 주소를 생성할 수 없습니다: ${url}`);
       }
 

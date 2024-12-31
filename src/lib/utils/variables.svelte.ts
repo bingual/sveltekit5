@@ -6,23 +6,36 @@ import { get, writable } from 'svelte/store';
 
 export const useLoadMore = (interval = 20) => {
   const key = $state('take');
-  const url = $state(page.url);
-
-  const getTake = $derived(Number(page.url.searchParams.get(key)) || interval);
+  const pageUrl = $derived(page.url);
   const currentTake = writable(interval);
 
   const loadMoreData = async () => {
     if (!browser) return;
 
-    currentTake.set(getTake + interval);
-    url.searchParams.set(key, String(get(currentTake)));
-    await goto(url.toString(), { replaceState: true, noScroll: true });
+    currentTake.update((take) => take + interval);
+
+    const updatedTake = String(get(currentTake));
+
+    if (pageUrl.searchParams.has(key)) {
+      pageUrl.searchParams.set(key, updatedTake);
+    } else {
+      pageUrl.searchParams.append(key, updatedTake);
+    }
+
+    await goto(pageUrl.toString(), { replaceState: true, noScroll: true, invalidateAll: true });
+  };
+
+  const resetTake = () => {
+    if (!pageUrl.searchParams.get(key)) {
+      currentTake.set(interval);
+    }
   };
 
   return {
     interval,
     currentTake,
     loadMoreData,
+    resetTake,
   };
 };
 
