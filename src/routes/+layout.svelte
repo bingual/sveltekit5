@@ -10,7 +10,7 @@
   import { setContext } from 'svelte';
   import { uiHelpers } from 'svelte-5-ui-lib';
 
-  import '@/app.pcss';
+  import '@/app.scss';
 
   let { children } = $props();
   setContext('toastStore', toastStore());
@@ -56,18 +56,24 @@
 </script>
 
 <header
-  class="fixed top-0 z-50 mx-auto w-full flex-none border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
+  class="sticky top-0 z-50 mx-auto w-full flex-none border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
 >
   <Navbar {sidebarUi} />
 </header>
 
-<div class="overflow-hidden lg:flex">
+<div class="w-full dark:bg-gray-900 lg:flex">
   <Sidebar {sidebarUi} />
-  <div class="relative h-full w-full overflow-y-auto px-6 pb-4 pt-20 md:ml-64">
-    <ParaglideJS {i18n}>
-      {@render children()}
-    </ParaglideJS>
-  </div>
+  <main class="w-full min-w-0 md:ml-64 lg:static lg:max-h-full lg:overflow-visible">
+    <div class="w-full">
+      <div
+        class="mx-auto min-w-0 max-w-7xl flex-col divide-y divide-gray-200 px-4 pb-8 pt-6 dark:divide-gray-800 lg:px-8"
+      >
+        <ParaglideJS {i18n}>
+          {@render children()}
+        </ParaglideJS>
+      </div>
+    </div>
+  </main>
 </div>
 
 {#if ModalComponent}

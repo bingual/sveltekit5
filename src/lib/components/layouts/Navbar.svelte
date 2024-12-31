@@ -7,6 +7,7 @@
   import {
     Avatar,
     Button,
+    Darkmode,
     Dropdown,
     DropdownFooter,
     DropdownHeader,
@@ -45,7 +46,14 @@
 </script>
 
 <div>
-  <Navbar {fluid} {navStatus} hamburgerMenu={false}>
+  <Navbar
+    navClass={clsx(
+      'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 divide-gray-200 dark:divide-gray-700 px-2 sm:px-4 w-full',
+    )}
+    {fluid}
+    {navStatus}
+    hamburgerMenu={false}
+  >
     {#snippet brand()}
       <NavBrand siteName="Adora">
         <Img imgClass={clsx('w-10')} src="/images/Adora.png" alt="svelte icon" />
@@ -54,6 +62,7 @@
 
     {#snippet navSlotBlock()}
       <div class="flex items-center space-x-1 md:order-2">
+        <Darkmode class="me-3 text-primary-500 dark:border-gray-800 dark:text-primary-600" />
         <!-- FIXME: dot 속성이 없거나 삼항연산자로 동적 할당할 때 버그있음 -->
         <Avatar
           onclick={dropdownUser.toggle}
@@ -74,7 +83,7 @@
               </DropdownHeader>
 
               <DropdownUl>
-                <DropdownLi href="#">계정</DropdownLi>
+                <DropdownLi href="#">관리</DropdownLi>
               </DropdownUl>
 
               <DropdownFooter class="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600">

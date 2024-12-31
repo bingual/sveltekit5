@@ -119,7 +119,7 @@
       }}>{actionMap($modalProps?.action).imageLabel}</Button
     >
     <Button
-      color="alternative"
+      color="gray"
       onclick={() => {
         closeModal();
       }}>취소</Button

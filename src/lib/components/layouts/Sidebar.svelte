@@ -71,9 +71,9 @@
             ]
           : []),
         {
-          label: '설정',
+          label: '관리',
           icon: CogOutline,
-          children: [{ childLabel: '계정', childHref: '#' }],
+          href: '#',
         },
       ],
     },
@@ -93,6 +93,9 @@
     closeSidebar={closeDemoSidebar}
     params={{ x: -50, duration: 50 }}
     position="fixed"
+    divClass={clsx(
+      'h-full px-3 py-4 overflow-y-auto border-e dark:border-e-gray-600 bg-white dark:bg-gray-800',
+    )}
     activeClass={clsx('p-2')}
     nonActiveClass={clsx('p-2')}
   >

@@ -35,7 +35,7 @@
   };
 </script>
 
-<div class="mx-auto @container">
+<div class="@container">
   <Table hoverable>
     {#snippet captionSlot()}
       <caption

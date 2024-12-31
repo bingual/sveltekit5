@@ -67,7 +67,7 @@
 </script>
 
 <!-- FIXME: 현재 svelte-5-ui-lib 베타버전 모달은 X축 반응형 동작에 버그있음. 모바일 환경에서 치명적임-->
-<Modal title={$modalTitle} {modalStatus} {closeModal}>
+<Modal title={$modalTitle} {modalStatus} {closeModal} size="xl">
   <div class="max-h-[70vh] overflow-hidden overflow-y-auto">
     {#if !isEmpty(errors)}
       <Alert {errors} />
@@ -86,7 +86,13 @@
       <div>
         <div>
           <Label class="mb-2 space-y-2" for="title"><span>제목</span></Label>
-          <Input type="text" id="title" name="title" value={memoData?.title} />
+          <Input
+            class="text-base dark:text-[#D1D5DB]"
+            type="text"
+            id="title"
+            name="title"
+            value={memoData?.title}
+          />
         </div>
 
         <div class="mt-5">
@@ -96,11 +102,11 @@
     </form>
 
     <div class="mt-5 flex items-center justify-between">
-      <Button color="dark" onclick={imageModalUi.toggle}><ImageSolid /></Button>
+      <Button color="rose" onclick={imageModalUi.toggle}><ImageSolid /></Button>
 
       <div class="flex space-x-2">
         <Button type="submit" form={formId} color="primary">{$modalButtonLabels.confirm}</Button>
-        <Button color="alternative" onclick={closeModal}>{$modalButtonLabels.cancel}</Button>
+        <Button color="gray" onclick={closeModal}>{$modalButtonLabels.cancel}</Button>
       </div>
     </div>
   </div>
