@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
+  import { useContext } from '$lib/utils/stores';
+  import { handleMemoModal } from '$lib/utils/variables.svelte';
 
   import { SignIn, SignOut } from '@auth/sveltekit/components';
   import clsx from 'clsx';
@@ -21,6 +24,10 @@
     NavUl,
     uiHelpers,
   } from 'svelte-5-ui-lib';
+
+  const {
+    modalStore: { setModal },
+  } = useContext();
 
   const userInfo = $derived(page.data.session?.user);
 
@@ -83,6 +90,13 @@
               </DropdownHeader>
 
               <DropdownUl>
+                <DropdownLi
+                  href="#"
+                  onclick={async () => {
+                    await goto('/memo');
+                    handleMemoModal(setModal, 'create');
+                  }}>글쓰기</DropdownLi
+                >
                 <DropdownLi href="#">관리</DropdownLi>
               </DropdownUl>
 

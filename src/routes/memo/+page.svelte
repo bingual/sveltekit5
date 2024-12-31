@@ -6,10 +6,10 @@
   import type { MemoWithImages } from '$lib/utils/prismaTypes';
   import { useContext } from '$lib/utils/stores';
   import { getPublicUrl } from '$lib/utils/variables';
-  import { generateNoDataMessage, useLoadMore } from '$lib/utils/variables.svelte';
+  import { generateNoDataMessage, handleMemoModal, useLoadMore } from '$lib/utils/variables.svelte';
 
   import { Render } from '@jill64/svelte-sanitize';
-  import { EditOutline, PenNibOutline, TrashBinOutline } from 'flowbite-svelte-icons';
+  import { EditOutline, TrashBinOutline } from 'flowbite-svelte-icons';
   import { isEmpty } from 'remeda';
   import { Button, Card, Heading, Input, P } from 'svelte-5-ui-lib';
 
@@ -35,25 +35,6 @@
     },
     { name: '내용', value: 'content' },
   ];
-
-  const handleModal = (action: ActionType, memoData?: MemoWithImages) => {
-    const actionMap = {
-      create: {
-        modalTitle: '메모 생성',
-        modalButtonLabels: { confirm: '생성', cancel: '취소' },
-        props: { action },
-      },
-      update: {
-        modalTitle: `메모 수정`,
-        modalButtonLabels: { confirm: '수정', cancel: '취소' },
-        props: { data: memoData, action },
-      },
-    };
-
-    const modalConfig = actionMap[action];
-
-    setModal('SetMemo', modalConfig.modalTitle, modalConfig.modalButtonLabels, modalConfig.props);
-  };
 
   const handleDelete: SubmitFunction = ({ cancel }) => {
     if (confirm('정말 삭제하시겠습니까?')) {
@@ -132,7 +113,7 @@
           </div>
 
           <div class="absolute bottom-3 left-3 flex gap-x-2 p-3">
-            <Button color="green" onclick={() => handleModal('update', memo)}
+            <Button color="green" onclick={() => handleMemoModal(setModal, 'update', memo)}
               ><EditOutline /></Button
             >
             <form use:enhance={handleDelete} method="POST" action="?/delete">
@@ -145,7 +126,6 @@
     </div>
 
     <!-- 페이지네이션 -->
-    {$currentTake}
     {#if data.memoTotalCount > interval}
       <div class="mt-10 grid place-items-center">
         <div class="text-center">
@@ -172,13 +152,4 @@
   {:else}
     <Heading class="mb-2" tag="h5">{noDataMessage}</Heading>
   {/if}
-
-  <!-- 플로팅 -->
-  <div
-    class="fixed bottom-[calc(12px+theme(inset.safe-bottom))] right-[calc(5px+theme(inset.safe-right))] z-40"
-  >
-    <Button size="sm" shadow onclick={() => handleModal('create')}>
-      <PenNibOutline size="xl" />
-    </Button>
-  </div>
 </div>
