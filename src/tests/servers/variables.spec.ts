@@ -1,10 +1,11 @@
-import { PUBLIC_SUPABASE_BUCKET, PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { storageManager } from '$lib/utils/variables.server';
 
 const { getOriginUrls, imageOptimizer, replaceBlobImageSrc, extractImgSrc } = storageManager();
 
+import { PUBLIC_SUPABASE_BUCKET } from '$env/static/public';
 import { localStorageManager } from '$lib/utils/variables';
 
+import { difference } from 'remeda';
 import sharp from 'sharp';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -12,28 +13,67 @@ vi.mock('$app/environment', () => ({
   browser: false,
 }));
 
+const httpsExampleUrl = 'https://example.com';
+const httpExampleUrl = 'http://example.com';
+
 describe('getOriginUrls', () => {
-  it('버킷 접두사 이후의 원래 경로를 반환해야 한다', () => {
+  const prefix = `${httpsExampleUrl}/${PUBLIC_SUPABASE_BUCKET}`;
+  const invalidPrefix1 = `${httpExampleUrl}/OTHER_BUCKET/images`;
+  const invalidPrefix2 = `${httpExampleUrl}/${PUBLIC_SUPABASE_BUCKET}`;
+  const invalidPrefix3 = `${httpExampleUrl}/images`;
+
+  it('정상적인 URL 목록에서 올바른 결과를 반환해야 한다', () => {
     const urls = [
-      `${PUBLIC_SUPABASE_URL}/${PUBLIC_SUPABASE_BUCKET}/images/image1.jpg`,
-      `${PUBLIC_SUPABASE_URL}/${PUBLIC_SUPABASE_BUCKET}/images/image2.jpg`,
+      `${prefix}/images/image1.jpg`,
+      `${prefix}/images/image2.jpg`,
+      `${prefix}/images/image3.jpg`,
+      `${prefix}/images/image4.jpg`,
     ];
-
-    const result = getOriginUrls(urls);
-
-    expect(result).toEqual([`images/image1.jpg`, `images/image2.jpg`]);
+    const expectedResult = [
+      'images/image1.jpg',
+      'images/image2.jpg',
+      'images/image3.jpg',
+      'images/image4.jpg',
+    ];
+    expect(getOriginUrls(urls)).toEqual(expectedResult);
   });
 
-  it('https로 시작하지 않는 URL을 처리해야 한다', () => {
-    const urls = [`http://${PUBLIC_SUPABASE_BUCKET}/images/image1.jpg`];
-
-    expect(() => getOriginUrls(urls)).toThrowError();
+  it('https로 시작하지 않는 URL은 결과에서 제외해야 한다', () => {
+    const urls = [
+      `${invalidPrefix1}/images/image1.jpg`,
+      `${invalidPrefix2}/images/image2.jpg`,
+      `${prefix}/images/image3.jpg`,
+      `${prefix}/images/image4.jpg`,
+    ];
+    const expectedResult = ['images/image3.jpg', 'images/image4.jpg'];
+    expect(getOriginUrls(urls)).toEqual(expectedResult);
   });
 
-  it('버킷 접두사가 없는 URL을 올바르게 처리해야 한다', () => {
-    const urls = [`${PUBLIC_SUPABASE_URL}/images`];
+  it('prefix와 일치하지 않는 URL은 결과에서 제외해야 한다', () => {
+    const urls = [
+      `${invalidPrefix1}/images/image1.jpg`,
+      `${invalidPrefix2}/images/image2.jpg`,
+      `${invalidPrefix3}/image3.jpg`,
+      `${prefix}/images/image4.jpg`,
+    ];
+    const expectedResult = ['images/image4.jpg'];
+    expect(getOriginUrls(urls)).toEqual(expectedResult);
+  });
 
-    expect(() => getOriginUrls(urls)).toThrowError();
+  it('유효한 URL이 하나도 없으면 빈 배열을 반환해야 한다', () => {
+    const urls = [
+      `${invalidPrefix1}/images/image1.jpg`,
+      `${invalidPrefix2}/images/image2.jpg`,
+      `${invalidPrefix3}/image3.jpg`,
+    ];
+    const expectedResult: string[] = [];
+    expect(getOriginUrls(urls)).toEqual(expectedResult);
+  });
+
+  it('빈 배열을 입력받으면 빈 배열을 반환해야 한다', () => {
+    const urls: string[] = [];
+    const expectedResult: string[] = [];
+    expect(getOriginUrls(urls)).toEqual(expectedResult);
   });
 });
 
@@ -76,17 +116,17 @@ describe('replaceBlobImageSrc', () => {
     `;
 
     const uploadResults = [
-      'https://example.com/image1-public-url',
-      'https://example.com/image2-public-url',
-      'https://example.com/image3-public-url',
+      `${httpsExampleUrl}/image1-public-url`,
+      `${httpsExampleUrl}/image2-public-url`,
+      `${httpsExampleUrl}/image3-public-url`,
     ];
 
     const expectedOutput = `
       <p>Some content</p>
-      <img src="https://example.com/image1-public-url" alt="Image 1" />
-      <img src="https://example.com/image2-public-url" alt="Image 2" />
+      <img src="${httpsExampleUrl}/image1-public-url" alt="Image 1" />
+      <img src="${httpsExampleUrl}/image2-public-url" alt="Image 2" />
       <p>More content</p>
-      <img src="https://example.com/image3-public-url" alt="Image 3" />
+      <img src="${httpsExampleUrl}/image3-public-url" alt="Image 3" />
     `;
 
     const result = replaceBlobImageSrc(content, uploadResults);
@@ -101,11 +141,11 @@ describe('replaceBlobImageSrc', () => {
       <img src="blob:example2" alt="Image 2" />
     `;
 
-    const uploadResults = ['https://example.com/image1-public-url']; // 하나의 결과만 제공
+    const uploadResults = [`${httpsExampleUrl}/image1-public-url`]; // 하나의 결과만 제공
 
     const expectedOutput = `
       <p>Some content</p>
-      <img src="https://example.com/image1-public-url" alt="Image 1" />
+      <img src="${httpsExampleUrl}/image1-public-url" alt="Image 1" />
       <img src="blob:example2" alt="Image 2" />
     `;
 
@@ -137,12 +177,13 @@ describe('extractImgSrc', () => {
   it('모든 img 태그의 src 속성을 추출해야 한다', () => {
     const htmlContent = `
       <p>Some content</p> 
-      <img src="https://example.com/image1.jpg" alt="Image 1">
+      <img src="${httpsExampleUrl}/image1.jpg" alt="Image 1">
+      <p></p> 
       <img src="images/image2.png">;
     `;
 
     const result = extractImgSrc(htmlContent);
-    expect(result).toEqual(['https://example.com/image1.jpg', 'images/image2.png']);
+    expect(result).toEqual([`${httpsExampleUrl}/image1.jpg`, 'images/image2.png']);
   });
 
   it('img 태그가 없으면 빈 배열을 반환해야 한다', () => {
@@ -158,16 +199,62 @@ describe('extractImgSrc', () => {
   });
 
   it('다양한 속성을 가진 img 태그의 src 속성을 추출해야 한다', () => {
-    const htmlContent =
-      '<img src="https://example.com/image.jpg" width="500" height="300" alt="Example">';
+    const htmlContent = `<img src="${httpsExampleUrl}/image.jpg" width="500" height="300" alt="Example">`;
     const result = extractImgSrc(htmlContent);
-    expect(result).toEqual(['https://example.com/image.jpg']);
+    expect(result).toEqual([`${httpsExampleUrl}/image.jpg`]);
   });
 
   it('깨진 img 태그를 무시해야 한다', () => {
-    const htmlContent = '<img src="https://example.com/image.jpg><p>Broken tag</p>';
+    const htmlContent = `<img src={"${httpsExampleUrl}/image.jpg><p>Broken tag</p>"}`;
     const result = extractImgSrc(htmlContent);
     expect(result).toEqual([]);
+  });
+});
+
+describe('getOriginUrls & extractImgSrc & difference 테스트', () => {
+  const prefix = `${httpsExampleUrl}/${PUBLIC_SUPABASE_BUCKET}`;
+
+  it('memoImageUrls와 extractedImgSrc가 동일한 경우 차이가 없어야 한다', () => {
+    const memoImageUrls = [`images/image1.jpg`, `images/image2.jpg`];
+
+    const sanitizedMemos = `
+      <img src="${prefix}/images/image1.jpg"/>
+      <img src="${prefix}/images/image2.jpg"/>
+    `;
+
+    const extractedImgSrc = getOriginUrls(extractImgSrc(sanitizedMemos));
+    const diffExtracted = difference(memoImageUrls, extractedImgSrc);
+
+    expect(diffExtracted).toEqual([]);
+  });
+
+  it('memoImageUrls가 더 많고 extractedImgSrc가 더 적은 경우 차이를 반환해야 한다', () => {
+    const memoImageUrls = [`images/image1.jpg`, `images/image2.jpg`, `images/image3.jpg`];
+
+    const sanitizedMemos = `
+      <img src="${prefix}/images/image1.jpg"/>
+      <img src="${prefix}/images/image2.jpg"/>
+    `;
+
+    const extractedImgSrc = getOriginUrls(extractImgSrc(sanitizedMemos));
+    const diffExtracted = difference(memoImageUrls, extractedImgSrc);
+
+    expect(diffExtracted).toEqual([`images/image3.jpg`]);
+  });
+
+  it('memoImageUrls가 더 적고 extractedImgSrc가 더 많은 경우 차이가 없어야 한다', () => {
+    const memoImageUrls = [`images/image1.jpg`];
+
+    const sanitizedMemos = `
+      <img src="${prefix}/images/image1.jpg"/>
+      <img src="${prefix}/images/image2.jpg"/>
+      <img src="${prefix}/images/image3.jpg"/>
+    `;
+
+    const extractedImgSrc = getOriginUrls(extractImgSrc(sanitizedMemos));
+    const diffExtracted = difference(memoImageUrls, extractedImgSrc);
+
+    expect(diffExtracted).toEqual([]);
   });
 });
 

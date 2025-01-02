@@ -3,7 +3,7 @@ import { supabase } from '$lib/supabaseClient';
 import { MemoWithImages } from '$lib/utils/prismaTypes';
 
 import { sanitize } from '@jill64/universal-sanitizer';
-import { isArray, isString, map, pipe, reduce } from 'remeda';
+import { filter, isArray, isString, map, pipe, reduce } from 'remeda';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -23,20 +23,15 @@ export const storageManager = () => {
   };
 
   const getOriginUrls = (urls: string[]) => {
-    return urls.map((url) => {
-      if (!url.startsWith('https')) {
-        throw new Error(`유효하지 않은 URL입니다: ${url} (https로 시작해야 합니다)`);
-      }
+    const prefix = PUBLIC_SUPABASE_BUCKET;
 
-      const prefix = `${PUBLIC_SUPABASE_BUCKET}/`;
-      const startIndex = url.indexOf(prefix);
+    const filteredUrls = pipe(
+      urls,
+      filter((url) => url.startsWith('https') && url.includes(prefix)),
+      map((url) => url.substring(url.indexOf(prefix) + prefix.length + 1)),
+    );
 
-      if (startIndex === -1) {
-        throw new Error(`URL에서 '${prefix}'를 찾을 수 없습니다: ${url}`);
-      }
-
-      return url.substring(startIndex + prefix.length);
-    });
+    return filteredUrls.length > 0 ? filteredUrls : [];
   };
 
   const imageOptimizer = async (

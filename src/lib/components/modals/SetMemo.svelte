@@ -11,7 +11,7 @@
   import type { SubmitFunction } from '@sveltejs/kit';
   import { ImageSolid } from 'flowbite-svelte-icons';
   import { forEach, isEmpty } from 'remeda';
-  import { type Writable, writable } from 'svelte/store';
+  import { writable } from 'svelte/store';
   import { Button, Input, Modal, uiHelpers } from 'svelte-5-ui-lib';
 
   const {
@@ -28,9 +28,9 @@
   let formId = $state('SetMemoForm');
   let errors = $state<ValidationError[]>([]);
 
-  let editorContent = writable('');
-  let selectedFiles: Writable<FileList | undefined> = writable();
-  let filePreviews: Writable<FilePreview[]> = writable([]);
+  let editorContent = writable<string | undefined>('');
+  let selectedFiles = writable<FileList | undefined>();
+  let filePreviews = writable<FilePreview[]>([]);
 
   const handleSubmit: SubmitFunction = () => {
     isLoading.set(true);
@@ -48,6 +48,10 @@
       isLoading.set(false);
     };
   };
+
+  $effect(() => {
+    editorContent.set(memoData?.content);
+  });
 
   $effect(() => {
     modalStatus = modalUi.isOpen;

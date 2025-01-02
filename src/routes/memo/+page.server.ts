@@ -148,20 +148,20 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
       if (formValidation.success) {
         const { id, title, content } = formValidation.data;
 
-        // 스토리지 이미지 업로드
         const validImageFiles = filter(imageFiles, (file) => file.size > 0 && file.name !== '');
         const uploadResults = !isEmpty(validImageFiles)
           ? await Promise.all(map(imageFiles, (file) => uploadPublicStorage(file, '/images/memo')))
           : [];
 
         const replaceContented = replaceBlobImageSrc(content, getPublicUrls(uploadResults));
+        const sanitizedMemos = sanitizeContents(replaceContented) as string;
 
         if (actionType === 'create') {
           const createdMemo = await prisma.memo.create({
             data: {
               author: session?.user?.id,
               title: title,
-              content: sanitizeContents(replaceContented) as string,
+              content: sanitizedMemos,
               images: {
                 create: map(uploadResults, (url) => ({
                   url,
@@ -179,10 +179,6 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
           }
         } else if (actionType === 'update') {
           // TODO: 매번 수정시 마다 삭제하는거보다는 CronJob으로 정기적으로 불필요한것들 삭제하는게 효율적이니 나중에 수정
-          // 스토리지 이미지 업데이트 시작
-          const replaceContented = replaceBlobImageSrc(content, getPublicUrls(uploadResults));
-          const sanitizedMemos = sanitizeContents(replaceContented) as string;
-
           const memoImages = await prisma.memoImage.findMany({
             select: {
               url: true,
@@ -197,13 +193,13 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
 
           const memoImageUrls = map(memoImages, (image) => image.url);
           const extractedImgSrc = getOriginUrls(extractImgSrc(sanitizedMemos));
+
           const diffExtracted = difference(memoImageUrls, extractedImgSrc);
 
           const urlsToDelete = map(diffExtracted, (imageUrl) => imageUrl);
           if (!isEmpty(urlsToDelete)) {
             await removePublicStorageFile(urlsToDelete);
           }
-          // 스토리지 이미지 업데이트 끝
 
           const [updatedMemo] = await prisma.$transaction(async (prisma) => {
             const updatedMemo = await prisma.memo.update({

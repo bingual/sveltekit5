@@ -64,7 +64,7 @@
     filePreviews: parentFilePreviews,
   }: {
     memoData: MemoWithImages | undefined;
-    editorContent: Writable<string>;
+    editorContent: Writable<string | undefined>;
     filePreviews: Writable<FilePreview[]>;
   } = $props();
 
