@@ -86,7 +86,15 @@
   });
 </script>
 
-<Modal {title} {modalStatus} {closeModal} size="sm" position="top-center" dismissable={false}>
+<Modal
+  {title}
+  {modalStatus}
+  {closeModal}
+  size="sm"
+  position="top-center"
+  dismissable={false}
+  outsideClose={false}
+>
   {#if !isEmpty(errors)}
     <Alert {errors} />
   {/if}

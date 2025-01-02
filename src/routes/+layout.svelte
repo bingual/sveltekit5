@@ -10,6 +10,7 @@
   import { setContext } from 'svelte';
   import { uiHelpers } from 'svelte-5-ui-lib';
 
+  import 'highlight.js/styles/atom-one-dark.css';
   import '@/app.scss';
 
   let { children } = $props();

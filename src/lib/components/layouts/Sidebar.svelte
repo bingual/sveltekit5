@@ -3,7 +3,13 @@
   import { page } from '$app/state';
 
   import clsx from 'clsx';
-  import { ChartOutline, CogOutline, LightbulbOutline, PenNibOutline } from 'flowbite-svelte-icons';
+  import {
+    ClipboardListOutline,
+    CogOutline,
+    LightbulbOutline,
+    ListMusicOutline,
+    PenNibOutline,
+  } from 'flowbite-svelte-icons';
   import {
     Sidebar,
     SidebarDropdownWrapper,
@@ -49,11 +55,11 @@
     {
       options: [{ border: false }],
       items: [
-        { label: '대쉬보드', href: '/', icon: ChartOutline },
-        ...(userInfo ? [{ label: '메모', href: '/memo', icon: PenNibOutline }] : []),
+        { label: '소개', href: '/', icon: ClipboardListOutline },
+        { label: '메모', href: '/memo', icon: PenNibOutline },
         {
           label: '플레이리스트',
-          icon: LightbulbOutline,
+          icon: ListMusicOutline,
           children: [{ childLabel: '멜론차트', childHref: '/playlist/melonChart' }],
         },
       ],

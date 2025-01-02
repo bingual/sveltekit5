@@ -12,7 +12,7 @@
   import { ImageSolid } from 'flowbite-svelte-icons';
   import { forEach, isEmpty } from 'remeda';
   import { type Writable, writable } from 'svelte/store';
-  import { Button, Input, Label, Modal, uiHelpers } from 'svelte-5-ui-lib';
+  import { Button, Input, Modal, uiHelpers } from 'svelte-5-ui-lib';
 
   const {
     modalStore: { modalState },
@@ -67,7 +67,14 @@
 </script>
 
 <!-- FIXME: 현재 svelte-5-ui-lib 베타버전 모달은 X축 반응형 동작에 버그있음. 모바일 환경에서 치명적임-->
-<Modal title={$modalTitle} {modalStatus} {closeModal} size="xl">
+<Modal
+  title={$modalTitle}
+  {modalStatus}
+  {closeModal}
+  size="xl"
+  dismissable={false}
+  outsideClose={false}
+>
   <div class="max-h-[70vh] overflow-hidden overflow-y-auto">
     {#if !isEmpty(errors)}
       <Alert {errors} />
@@ -85,13 +92,13 @@
       <input type="file" hidden={true} name="images" bind:files={$selectedFiles} multiple />
       <div>
         <div>
-          <Label class="mb-2 space-y-2" for="title"><span>제목</span></Label>
           <Input
             class="bg-white text-base dark:bg-gray-900 dark:text-[#D1D5DB]"
             type="text"
             id="title"
             name="title"
             value={memoData?.title}
+            placeholder="제목을 입력하세요"
           />
         </div>
 
@@ -100,8 +107,10 @@
         </div>
       </div>
     </form>
+  </div>
 
-    <div class="mt-5 flex items-center justify-between">
+  {#snippet footer()}
+    <div class="flex w-full justify-between">
       <Button color="rose" onclick={imageModalUi.toggle}><ImageSolid /></Button>
 
       <div class="flex space-x-2">
@@ -109,7 +118,7 @@
         <Button color="gray" onclick={closeModal}>{$modalButtonLabels.cancel}</Button>
       </div>
     </div>
-  </div>
+  {/snippet}
 </Modal>
 
 {#if imageModalUi.isOpen}

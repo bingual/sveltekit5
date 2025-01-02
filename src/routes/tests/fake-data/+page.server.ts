@@ -75,7 +75,7 @@ export const actions = {
           author: session?.user?.id,
           title: faker.lorem.sentence(),
           content: content,
-          created_at: new Date(now.getTime() - index * 1000),
+          createdAt: new Date(now.getTime() - index * 1000),
           memoImages: imageUrls,
         };
       }),
@@ -90,7 +90,7 @@ export const actions = {
       const createdMemos = await prisma.memo.findMany({
         select: { id: true },
         where: { author: session?.user?.id },
-        orderBy: { created_at: 'desc' },
+        orderBy: { createdAt: 'desc' },
         take: createdMemosCount.count,
       });
 

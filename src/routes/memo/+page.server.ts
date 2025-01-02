@@ -1,3 +1,4 @@
+import { ROOT_USER } from '$env/static/private';
 import { prisma } from '$lib/prisma';
 import { MemoWithImages } from '$lib/utils/prismaTypes';
 import { sanitizeContents, storageManager } from '$lib/utils/variables.server';
@@ -26,10 +27,17 @@ export const load: PageServerLoad = async ({ parent, url }) => {
   const query = searchParams.get('query') ?? '';
   const take = Number(searchParams.get('take')) || 20;
 
+  const rootUser = await prisma.user.findFirst({
+    select: { id: true },
+    where: {
+      email: ROOT_USER,
+    },
+  });
+
   const [memos, memoTotalCount] = await Promise.all([
     prisma.memo.findMany({
       where: {
-        author: session?.user?.id,
+        author: session?.user?.id || rootUser?.id,
         ...(query &&
           category === 'all' && {
             OR: [{ title: { contains: query } }, { content: { contains: query } }],
@@ -37,7 +45,7 @@ export const load: PageServerLoad = async ({ parent, url }) => {
         ...(category !== 'all' && query && { [category]: { contains: query } }),
       },
       orderBy: {
-        created_at: 'desc',
+        createdAt: 'desc',
       },
       take,
       include: {
@@ -48,7 +56,7 @@ export const load: PageServerLoad = async ({ parent, url }) => {
     }),
     prisma.memo.count({
       where: {
-        author: session?.user?.id,
+        author: session?.user?.id || rootUser?.id,
         ...(query &&
           category === 'all' && {
             OR: [{ title: { contains: query } }, { content: { contains: query } }],
@@ -56,7 +64,7 @@ export const load: PageServerLoad = async ({ parent, url }) => {
         ...(category !== 'all' && query && { [category]: { contains: query } }),
       },
       orderBy: {
-        created_at: 'desc',
+        createdAt: 'desc',
       },
     }),
   ]);
@@ -86,7 +94,7 @@ const handleAction = async (locals: App.Locals, request: Request, actionType: Ac
     const session = await locals.auth();
 
     if (!session?.user?.id) {
-      return redirect(302, '/');
+      return redirect(302, '/memo');
     }
 
     const formData = await request.formData();

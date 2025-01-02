@@ -5,7 +5,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async () => {
   const findPlaylist = await prisma.youTubePlaylist.findFirst({
     orderBy: {
-      created_at: 'desc',
+      createdAt: 'desc',
     },
     include: {
       videoInfos: true,

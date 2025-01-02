@@ -8,6 +8,7 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// 계정 시작
 model Account {
   id                String  @id @default(cuid())
   userId            String  @map("user_id")
@@ -60,34 +61,76 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-// locals
+// 계정 끝
+
+// 메모 시작
+model MemoCategoryAssignment {
+  id         String       @id @default(cuid())
+  memoId     String       @map("memo_id")
+  categoryId String       @map("category_id")
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime     @updatedAt @map("updated_at") @db.Timestamptz()
+  memo       Memo         @relation(fields: [memoId], references: [id], onDelete: Cascade)
+  category   MemoCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([memoId, categoryId]) // 동일 메모가 동일 카테고리에 중복 등록되지 않도록 제한
+  @@map("memo_category_assignments")
+}
+
+model MemoCategory {
+  id            String                   @id @default(cuid())
+  name          String                   @unique @db.VarChar(50)
+  createdAt     DateTime                 @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime                 @updatedAt @map("updated_at") @db.Timestamptz()
+  subCategories MemoSubCategory[]
+  assignments   MemoCategoryAssignment[]
+
+  @@map("memo_categories")
+}
+
+model MemoSubCategory {
+  id         String       @id @default(cuid())
+  categoryId String       @map("category_id")
+  name       String       @db.VarChar(50)
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime     @updatedAt @map("updated_at") @db.Timestamptz()
+  category   MemoCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([name, categoryId]) // 같은 메인 카테고리 내에서는 중복 허용 안 함
+  @@map("memo_sub_categories")
+}
+
 model Memo {
-  id         String      @id @default(cuid())
-  author     String
-  title      String      @db.VarChar(100)
-  content    String
-  created_at DateTime    @default(now()) @db.Timestamptz()
-  updated_at DateTime    @updatedAt @db.Timestamptz()
-  user       User        @relation(fields: [author], references: [id], onDelete: Cascade)
-  images     MemoImage[]
+  id          String                   @id @default(cuid())
+  author      String
+  title       String                   @db.VarChar(100)
+  content     String
+  createdAt   DateTime                 @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime                 @updatedAt @map("updated_at") @db.Timestamptz()
+  user        User                     @relation(fields: [author], references: [id], onDelete: Cascade)
+  images      MemoImage[]
+  assignments MemoCategoryAssignment[]
 
   @@map("memos")
 }
 
 model MemoImage {
   id     String @id @default(cuid())
-  url    String
   memoId String @map("memo_id")
+  url    String
   memo   Memo   @relation(fields: [memoId], references: [id], onDelete: Cascade)
 
   @@map("memo_images")
 }
 
+// 메모 끝
+
+// 기타 시작
 model YouTubePlaylist {
   id         String             @id @default(cuid())
   title      String             @db.VarChar(100)
-  created_at DateTime           @default(now()) @db.Timestamptz()
-  updated_at DateTime           @updatedAt @db.Timestamptz()
+  createdAt  DateTime           @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime           @updatedAt @map("updated_at") @db.Timestamptz()
   videoInfos YouTubeVideoInfo[]
 
   @@map("youtube_playlist")
@@ -102,10 +145,12 @@ model YouTubeVideoInfo {
   date              String          @db.VarChar(100)
   thumbUrl          String
   shareUrl          String
-  created_at        DateTime        @default(now()) @db.Timestamptz()
-  updated_at        DateTime        @updatedAt @db.Timestamptz()
+  createdAt         DateTime        @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt         DateTime        @updatedAt @map("updated_at") @db.Timestamptz()
   youtubePlaylistId String          @map("youtube_playlist_id")
   youTubePlaylist   YouTubePlaylist @relation(fields: [youtubePlaylistId], references: [id])
 
   @@map("youtube_video_infos")
 }
+
+// 기타 끝

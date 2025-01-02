@@ -22,7 +22,7 @@
   import { createLowlight } from 'lowlight';
   import { map } from 'remeda';
   import type { Readable, Writable } from 'svelte/store';
-  import { Label, Tooltip } from 'svelte-5-ui-lib';
+  import { Tooltip } from 'svelte-5-ui-lib';
   import {
     Bars3,
     Bars3BottomLeft,
@@ -46,8 +46,6 @@
   } from 'svelte-hero-icons';
   import { createEditor, Editor, EditorContent } from 'svelte-tiptap';
   import ImageResize from 'tiptap-extension-resize-image';
-
-  import 'highlight.js/styles/atom-one-dark.css';
 
   const lowlight = createLowlight();
   lowlight.register('html', html);
@@ -316,13 +314,12 @@
 </script>
 
 <div>
-  <Label class="my-2 space-y-2"><span>내용</span></Label>
   {#if $editor}
     <div class="flex items-center space-x-4 space-y-1">
       {#each buttonGroups as group}
         <div class="flex flex-wrap gap-1">
           {#each group.buttons as btn}
-            <div>
+            <div class="">
               <button
                 type="button"
                 id={btn.name}
@@ -349,7 +346,7 @@
   {/if}
 </div>
 
-<div class="my-5">
+<div class="mt-5">
   <EditorContent
     class="prose prose-sm max-w-none dark:prose-invert xs:prose-base"
     editor={$editor}

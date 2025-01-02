@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { useContext } from '$lib/utils/stores';
   import { handleMemoModal } from '$lib/utils/variables.svelte';
@@ -90,14 +89,13 @@
               </DropdownHeader>
 
               <DropdownUl>
+                <DropdownLi href="#">관리</DropdownLi>
                 <DropdownLi
-                  href="#"
+                  href="/memo"
                   onclick={async () => {
-                    await goto('/memo');
                     handleMemoModal(setModal, 'create');
                   }}>글쓰기</DropdownLi
                 >
-                <DropdownLi href="#">관리</DropdownLi>
               </DropdownUl>
 
               <DropdownFooter class="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600">
@@ -139,7 +137,7 @@
 
     {#if dummy}
       <NavUl class="order-1">
-        <NavLi href="/">대쉬보드</NavLi>
+        <NavLi href="/">dummy</NavLi>
       </NavUl>
     {/if}
   </Navbar>

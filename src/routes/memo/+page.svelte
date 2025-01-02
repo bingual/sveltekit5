@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
+  import { page } from '$app/state';
   import SearchBar from '$lib/components/SearchBar.svelte';
   import { actionMap } from '$lib/utils/mapping';
   import type { MemoWithImages } from '$lib/utils/prismaTypes';
@@ -9,7 +10,7 @@
   import { generateNoDataMessage, handleMemoModal, useLoadMore } from '$lib/utils/variables.svelte';
 
   import { Render } from '@jill64/svelte-sanitize';
-  import { EditOutline, TrashBinOutline } from 'flowbite-svelte-icons';
+  import { EditOutline, EyeOutline, TrashBinOutline } from 'flowbite-svelte-icons';
   import { isEmpty } from 'remeda';
   import { Button, Card, Heading, Input, P } from 'svelte-5-ui-lib';
 
@@ -25,8 +26,9 @@
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
-  let isMemos = $derived(isEmpty(data.memos));
-  let noDataMessage = $derived(generateNoDataMessage());
+  const userInfo = $derived(page.data.session?.user);
+  const isMemos = $derived(isEmpty(data.memos));
+  const noDataMessage = $derived(generateNoDataMessage());
 
   const items = [
     {
@@ -112,14 +114,25 @@
             </P>
           </div>
 
-          <div class="absolute bottom-3 left-3 flex gap-x-2 p-3">
-            <Button color="green" onclick={() => handleMemoModal(setModal, 'update', memo)}
-              ><EditOutline /></Button
-            >
-            <form use:enhance={handleDelete} method="POST" action="?/delete">
-              <Input type="hidden" name="id" value={memo.id} />
-              <Button color="red" type="submit"><TrashBinOutline /></Button>
-            </form>
+          <!-- 버튼 컨테이너 -->
+          <div
+            class="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-x-3 p-3"
+          >
+            <Button onclick={() => goto(`/memo/${memo.id}`)}>
+              <EyeOutline />
+            </Button>
+
+            {#if userInfo?.id}
+              <div class="flex gap-x-2">
+                <Button color="green" onclick={() => handleMemoModal(setModal, 'update', memo)}>
+                  <EditOutline />
+                </Button>
+                <form use:enhance={handleDelete} method="POST" action="?/delete">
+                  <Input type="hidden" name="id" value={memo.id} />
+                  <Button color="red" type="submit"><TrashBinOutline /></Button>
+                </form>
+              </div>
+            {/if}
           </div>
         </Card>
       {/each}
