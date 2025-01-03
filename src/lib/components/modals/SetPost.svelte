@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
+  import { page } from '$app/state';
   import Alert from '$lib/components/Alert.svelte';
   import MarkDownEditor from '$lib/components/MarkDownEditor.svelte';
   import SetImage from '$lib/components/modals/SetImage.svelte';
@@ -84,7 +85,7 @@
       use:enhance={handleSubmit}
       id={formId}
       method="POST"
-      action={`/posts?/${actionMap($modalProps?.action).actionType}`}
+      action={`${page.url.pathname}?/${actionMap($modalProps?.action).actionType}`}
       enctype="multipart/form-data"
     >
       <input type="hidden" name="id" value={postData?.id} />

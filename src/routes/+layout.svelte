@@ -1,19 +1,15 @@
 <script lang="ts">
-  import Navbar from '$lib/components/layouts/Navbar.svelte';
-  import Sidebar from '$lib/components/layouts/Sidebar.svelte';
   import Spinner from '$lib/components/layouts/Spinner.svelte';
   import Toast from '$lib/components/layouts/Toast.svelte';
-  import { i18n } from '$lib/i18n';
   import { isLoading, modalStore, toastStore, useContext } from '$lib/utils/stores';
 
-  import { ParaglideJS } from '@inlang/paraglide-sveltekit';
   import { setContext } from 'svelte';
-  import { uiHelpers } from 'svelte-5-ui-lib';
 
   import 'highlight.js/styles/atom-one-dark.css';
   import '@/app.scss';
 
   let { children } = $props();
+
   setContext('toastStore', toastStore());
   setContext('modalStore', modalStore());
   setContext('isLoading', isLoading());
@@ -27,8 +23,6 @@
   const { modalState, resetModal } = ContextModalStore;
 
   const { modalUi, currentModalName, modalNames } = modalState();
-
-  const sidebarUi = uiHelpers();
 
   let ModalComponent: any = $state();
 
@@ -56,26 +50,7 @@
   });
 </script>
 
-<header
-  class="sticky top-0 z-50 mx-auto w-full flex-none border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
->
-  <Navbar {sidebarUi} />
-</header>
-
-<div class="w-full dark:bg-gray-900 lg:flex">
-  <Sidebar {sidebarUi} />
-  <main class="w-full min-w-0 md:ml-64 lg:static lg:max-h-full lg:overflow-visible">
-    <div class="w-full">
-      <div
-        class="mx-auto min-w-0 max-w-7xl flex-col divide-y divide-gray-200 px-4 pb-8 pt-6 dark:divide-gray-800 lg:px-8"
-      >
-        <ParaglideJS {i18n}>
-          {@render children()}
-        </ParaglideJS>
-      </div>
-    </div>
-  </main>
-</div>
+{@render children()}
 
 {#if ModalComponent}
   {@render ModalComponent()}

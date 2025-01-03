@@ -91,7 +91,7 @@
               <DropdownUl>
                 <DropdownLi href="#">관리</DropdownLi>
                 <DropdownLi
-                  href="/posts"
+                  href="/general/posts"
                   onclick={async () => {
                     handlePostModal(setModal, 'create');
                   }}>글쓰기</DropdownLi

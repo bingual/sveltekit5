@@ -178,7 +178,7 @@ export const sanitizeContents = (htmlContents: PostWithImages[] | string) => {
         allowedIframeHostnames: [],
         transformTags: {
           img: (tagName, attribs) => {
-            const src = attribs.src || '';
+            const src = attribs.src ?? '';
             if (!/^https?:\/\/|^\/(images|uploads)\//.test(src)) {
               delete attribs.src;
             }

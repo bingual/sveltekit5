@@ -10,9 +10,9 @@ export const actionMap = (value: ActionType = 'create') => {
     update: '등록',
   };
 
-  const actionType = value || 'create';
-  const toastLabel = toastLabelMap[value] || '';
-  const imageLabel = imageLabelMap[value] || '';
+  const actionType = value ?? 'create';
+  const toastLabel = toastLabelMap[value] ?? '';
+  const imageLabel = imageLabelMap[value] ?? '';
 
   return {
     actionType,

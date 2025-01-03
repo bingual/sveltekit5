@@ -7,7 +7,11 @@
   import type { PostWithImages } from '$lib/utils/prismaTypes';
   import { useContext } from '$lib/utils/stores';
   import { getPublicUrl } from '$lib/utils/variables';
-  import { generateNoDataMessage, handlePostModal, useLoadMore } from '$lib/utils/variables.svelte';
+  import {
+    generateNoDataMessage,
+    handlePostModal,
+    useLoadMore,
+  } from '$lib/utils/variables.svelte.js';
 
   import { Render } from '@jill64/svelte-sanitize';
   import { EditOutline, EyeOutline, TrashBinOutline } from 'flowbite-svelte-icons';
@@ -118,7 +122,7 @@
           <div
             class="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-x-3 p-3"
           >
-            <Button onclick={() => goto(`/posts/${post.id}`)}>
+            <Button onclick={() => goto(`posts/${post.id}`)}>
               <EyeOutline />
             </Button>
 

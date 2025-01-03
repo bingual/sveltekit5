@@ -313,5 +313,7 @@ vite.config.ts.timestamp-*
 *.7z
 
 #tests
+test.ts
 test-results
-src/routes/tests
+src/routes/general/tests/+page.svelte
+src/routes/general/tests/+page.server.ts

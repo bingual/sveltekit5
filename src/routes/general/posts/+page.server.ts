@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ parent, url }) => {
   const [posts, postTotalCount] = await Promise.all([
     prisma.post.findMany({
       where: {
-        author: session?.user?.id || rootUser?.id,
+        author: session?.user?.id ?? rootUser?.id,
         ...(query &&
           category === 'all' && {
             OR: [{ title: { contains: query } }, { content: { contains: query } }],
@@ -56,7 +56,7 @@ export const load: PageServerLoad = async ({ parent, url }) => {
     }),
     prisma.post.count({
       where: {
-        author: session?.user?.id || rootUser?.id,
+        author: session?.user?.id ?? rootUser?.id,
         ...(query &&
           category === 'all' && {
             OR: [{ title: { contains: query } }, { content: { contains: query } }],

@@ -56,11 +56,11 @@
       options: [{ border: false }],
       items: [
         { label: '소개', href: '/', icon: ClipboardListOutline },
-        { label: '포스트', href: '/posts', icon: PenNibOutline },
+        { label: '포스트', href: '/general/posts', icon: PenNibOutline },
         {
           label: '플레이리스트',
           icon: ListMusicOutline,
-          children: [{ childLabel: '멜론차트', childHref: '/playlist/melonChart' }],
+          children: [{ childLabel: '멜론차트', childHref: '/general/playlist/melonChart' }],
         },
       ],
     },
