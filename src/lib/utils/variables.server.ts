@@ -1,6 +1,6 @@
 import { PUBLIC_SUPABASE_BUCKET } from '$env/static/public';
 import { supabase } from '$lib/supabaseClient';
-import { MemoWithImages } from '$lib/utils/prismaTypes';
+import { PostWithImages } from '$lib/utils/prismaTypes';
 
 import { sanitize } from '@jill64/universal-sanitizer';
 import { filter, isArray, isString, map, pipe, reduce } from 'remeda';
@@ -122,7 +122,7 @@ export const storageManager = () => {
   };
 };
 
-export const sanitizeContents = (htmlContents: MemoWithImages[] | string) => {
+export const sanitizeContents = (htmlContents: PostWithImages[] | string) => {
   const sanitizeConfig = (htmlContent: string) => {
     return sanitize(htmlContent, {
       sanitizeHtml: {

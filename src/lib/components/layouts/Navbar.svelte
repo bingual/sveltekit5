@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { useContext } from '$lib/utils/stores';
-  import { handleMemoModal } from '$lib/utils/variables.svelte';
+  import { handlePostModal } from '$lib/utils/variables.svelte';
 
   import { SignIn, SignOut } from '@auth/sveltekit/components';
   import clsx from 'clsx';
@@ -91,9 +91,9 @@
               <DropdownUl>
                 <DropdownLi href="#">관리</DropdownLi>
                 <DropdownLi
-                  href="/memo"
+                  href="/posts"
                   onclick={async () => {
-                    handleMemoModal(setModal, 'create');
+                    handlePostModal(setModal, 'create');
                   }}>글쓰기</DropdownLi
                 >
               </DropdownUl>

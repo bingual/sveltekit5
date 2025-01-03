@@ -28,7 +28,7 @@
     if (form?.success) {
       const count = `'${form.data}'`;
       const action = actionMap(form.action).toastLabel;
-      const toastMessage = `메모를 ${count}개 ${action}하였습니다.`;
+      const toastMessage = `포스트를 ${count}개 ${action}하였습니다.`;
       addToast(toastMessage, form.action === 'delete' ? 'red' : 'green');
     }
   });
@@ -37,8 +37,8 @@
 <div class="@container">
   <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
     <Card size="md">
-      <Heading tag="h3" class="prose lg:prose-lg xl:prose-xl">메모 데이터 생성</Heading>
-      <form use:enhance={handleSubmit} method="POST" action="?/memoCreate">
+      <Heading tag="h3" class="prose lg:prose-lg xl:prose-xl">포스트 데이터 생성</Heading>
+      <form use:enhance={handleSubmit} method="POST" action="?/postCreate">
         <div>
           <Label class="prose my-2 space-y-2 lg:prose-lg xl:prose-xl" for="count"
             ><span>생성할 개수</span></Label
@@ -48,7 +48,7 @@
 
         <div class="mt-3">
           <Button color="green" type="submit">생성</Button>
-          <Button color="red" type="submit" formaction="?/memoDelete">전체 삭제</Button>
+          <Button color="red" type="submit" formaction="?/postDelete">전체 삭제</Button>
         </div>
       </form>
     </Card>

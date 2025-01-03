@@ -5,7 +5,7 @@
   import MarkDownEditor from '$lib/components/MarkDownEditor.svelte';
   import SetImage from '$lib/components/modals/SetImage.svelte';
   import { actionMap } from '$lib/utils/mapping';
-  import type { MemoWithImages } from '$lib/utils/prismaTypes';
+  import type { PostWithImages } from '$lib/utils/prismaTypes';
   import { useContext } from '$lib/utils/stores';
 
   import type { SubmitFunction } from '@sveltejs/kit';
@@ -22,10 +22,10 @@
   const imageModalUi = uiHelpers();
   const closeModal = modalUi.close;
 
-  let memoData: MemoWithImages | undefined = $derived($modalProps?.data);
+  let postData: PostWithImages | undefined = $derived($modalProps?.data);
 
   let modalStatus = $state(false);
-  let formId = $state('SetMemoForm');
+  let formId = $state('SetPostForm');
   let errors = $state<ValidationError[]>([]);
 
   let editorContent = writable<string | undefined>('');
@@ -48,10 +48,6 @@
       isLoading.set(false);
     };
   };
-
-  $effect(() => {
-    editorContent.set(memoData?.content);
-  });
 
   $effect(() => {
     modalStatus = modalUi.isOpen;
@@ -88,10 +84,10 @@
       use:enhance={handleSubmit}
       id={formId}
       method="POST"
-      action={`/memo?/${actionMap($modalProps?.action).actionType}`}
+      action={`/posts?/${actionMap($modalProps?.action).actionType}`}
       enctype="multipart/form-data"
     >
-      <input type="hidden" name="id" value={memoData?.id} />
+      <input type="hidden" name="id" value={postData?.id} />
       <input type="hidden" name="content" bind:value={$editorContent} />
       <input type="file" hidden={true} name="images" bind:files={$selectedFiles} multiple />
       <div>
@@ -101,13 +97,13 @@
             type="text"
             id="title"
             name="title"
-            value={memoData?.title}
+            value={postData?.title}
             placeholder="제목을 입력하세요"
           />
         </div>
 
         <div class="mt-5">
-          <MarkDownEditor {memoData} {editorContent} {filePreviews} />
+          <MarkDownEditor {postData} {editorContent} {filePreviews} />
         </div>
       </div>
     </form>

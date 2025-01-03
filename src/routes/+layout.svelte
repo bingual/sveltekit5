@@ -34,8 +34,8 @@
 
   const loadComponent = async (name: string) => {
     switch (name) {
-      case modalNames.SetMemo:
-        ModalComponent = (await import('$lib/components/modals/SetMemo.svelte')).default;
+      case modalNames.SetPost:
+        ModalComponent = (await import('$lib/components/modals/SetPost.svelte')).default;
         break;
       case modalNames.SetVideo:
         ModalComponent = (await import('$lib/components/modals/SetVideo.svelte')).default;

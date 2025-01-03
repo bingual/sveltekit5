@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
-import type { MemoWithImages } from '$lib/utils/prismaTypes';
+import type { PostWithImages } from '$lib/utils/prismaTypes';
 import { modalStore } from '$lib/utils/stores';
 
 import { get, writable } from 'svelte/store';
@@ -47,25 +47,25 @@ export const generateNoDataMessage = () => {
 };
 
 type SetModalType = ReturnType<typeof modalStore>['setModal'];
-export const handleMemoModal = (
+export const handlePostModal = (
   setModal: SetModalType,
   action: ActionType,
-  memoData?: MemoWithImages,
+  postData?: PostWithImages,
 ) => {
   const actionMap = {
     create: {
-      modalTitle: '메모 생성',
+      modalTitle: '포스트 생성',
       modalButtonLabels: { confirm: '생성', cancel: '취소' },
       props: { action },
     },
     update: {
-      modalTitle: `메모 수정`,
+      modalTitle: `포스트 수정`,
       modalButtonLabels: { confirm: '수정', cancel: '취소' },
-      props: { data: memoData, action },
+      props: { data: postData, action },
     },
   };
 
   const modalConfig = actionMap[action];
 
-  setModal('SetMemo', modalConfig.modalTitle, modalConfig.modalButtonLabels, modalConfig.props);
+  setModal('SetPost', modalConfig.modalTitle, modalConfig.modalButtonLabels, modalConfig.props);
 };

@@ -214,45 +214,45 @@ describe('extractImgSrc', () => {
 describe('getOriginUrls & extractImgSrc & difference 테스트', () => {
   const prefix = `${httpsExampleUrl}/${PUBLIC_SUPABASE_BUCKET}`;
 
-  it('memoImageUrls와 extractedImgSrc가 동일한 경우 차이가 없어야 한다', () => {
-    const memoImageUrls = [`images/image1.jpg`, `images/image2.jpg`];
+  it('postImageUrls와 extractedImgSrc가 동일한 경우 차이가 없어야 한다', () => {
+    const postImageUrls = [`images/image1.jpg`, `images/image2.jpg`];
 
-    const sanitizedMemos = `
+    const sanitizedPosts = `
       <img src="${prefix}/images/image1.jpg"/>
       <img src="${prefix}/images/image2.jpg"/>
     `;
 
-    const extractedImgSrc = getOriginUrls(extractImgSrc(sanitizedMemos));
-    const diffExtracted = difference(memoImageUrls, extractedImgSrc);
+    const extractedImgSrc = getOriginUrls(extractImgSrc(sanitizedPosts));
+    const diffExtracted = difference(postImageUrls, extractedImgSrc);
 
     expect(diffExtracted).toEqual([]);
   });
 
-  it('memoImageUrls가 더 많고 extractedImgSrc가 더 적은 경우 차이를 반환해야 한다', () => {
-    const memoImageUrls = [`images/image1.jpg`, `images/image2.jpg`, `images/image3.jpg`];
+  it('postImageUrls가 더 많고 extractedImgSrc가 더 적은 경우 차이를 반환해야 한다', () => {
+    const postImageUrls = [`images/image1.jpg`, `images/image2.jpg`, `images/image3.jpg`];
 
-    const sanitizedMemos = `
+    const sanitizedPosts = `
       <img src="${prefix}/images/image1.jpg"/>
       <img src="${prefix}/images/image2.jpg"/>
     `;
 
-    const extractedImgSrc = getOriginUrls(extractImgSrc(sanitizedMemos));
-    const diffExtracted = difference(memoImageUrls, extractedImgSrc);
+    const extractedImgSrc = getOriginUrls(extractImgSrc(sanitizedPosts));
+    const diffExtracted = difference(postImageUrls, extractedImgSrc);
 
     expect(diffExtracted).toEqual([`images/image3.jpg`]);
   });
 
-  it('memoImageUrls가 더 적고 extractedImgSrc가 더 많은 경우 차이가 없어야 한다', () => {
-    const memoImageUrls = [`images/image1.jpg`];
+  it('postImageUrls가 더 적고 extractedImgSrc가 더 많은 경우 차이가 없어야 한다', () => {
+    const postImageUrls = [`images/image1.jpg`];
 
-    const sanitizedMemos = `
+    const sanitizedPosts = `
       <img src="${prefix}/images/image1.jpg"/>
       <img src="${prefix}/images/image2.jpg"/>
       <img src="${prefix}/images/image3.jpg"/>
     `;
 
-    const extractedImgSrc = getOriginUrls(extractImgSrc(sanitizedMemos));
-    const diffExtracted = difference(memoImageUrls, extractedImgSrc);
+    const extractedImgSrc = getOriginUrls(extractImgSrc(sanitizedPosts));
+    const diffExtracted = difference(postImageUrls, extractedImgSrc);
 
     expect(diffExtracted).toEqual([]);
   });
@@ -267,9 +267,6 @@ describe('localStorageManager (Non-Browser 환경)', () => {
   });
 
   it('브라우저 환경이 아니라면 undefined를 반환해야한다.', () => {
-    vi.mock('$app/environment', () => ({
-      browser: false,
-    }));
     const { saveToLocalStorage, clearLocalStorage, loadFromLocalStorage } = localStorageManager();
 
     saveToLocalStorage(mockKey, mockValue);

@@ -8,7 +8,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ params }) => {
   const { id } = params;
 
-  const memo = await prisma.memo.findFirst({
+  const post = await prisma.post.findFirst({
     select: {
       title: true,
       content: true,
@@ -18,15 +18,15 @@ export const load: PageServerLoad = async ({ params }) => {
     },
   });
 
-  if (!memo) {
-    return redirect(302, '/memo');
+  if (!post) {
+    return redirect(302, '/post');
   }
 
-  if (memo) {
-    const sanitizeMemo = sanitizeContents(memo.content) as string;
+  if (post) {
+    const sanitizePost = sanitizeContents(post.content) as string;
     return {
-      title: memo.title,
-      content: sanitizeMemo,
+      title: post.title,
+      content: sanitizePost,
     };
   }
 };

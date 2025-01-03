@@ -80,7 +80,7 @@ export const toastStore = () => {
 
 export const modalStore = () => {
   const modalNames = {
-    SetMemo: 'SetMemo',
+    SetPost: 'SetPost',
     SetVideo: 'SetVideo',
   } as const;
 

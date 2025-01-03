@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { MemoWithImages } from '$lib/utils/prismaTypes';
+  import type { PostWithImages } from '$lib/utils/prismaTypes';
 
   import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
   import { Color } from '@tiptap/extension-color';
@@ -59,11 +59,11 @@
   lowlight.register('shell', shell);
 
   let {
-    memoData,
+    postData,
     editorContent = $bindable(),
     filePreviews: parentFilePreviews,
   }: {
-    memoData: MemoWithImages | undefined;
+    postData: PostWithImages | undefined;
     editorContent: Writable<string | undefined>;
     filePreviews: Writable<FilePreview[]>;
   } = $props();
@@ -291,7 +291,7 @@
           },
         }),
       ],
-      content: memoData?.content,
+      content: postData?.content,
       onUpdate: ({ editor }) => {
         editorContent.set(editor.getHTML());
       },

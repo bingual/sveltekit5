@@ -1,6 +1,6 @@
 import type { Prisma } from '@prisma/client';
 
-export type MemoWithImages = Prisma.MemoGetPayload<{
+export type PostWithImages = Prisma.PostGetPayload<{
   include: {
     images: {
       select: {

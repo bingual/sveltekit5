@@ -8,7 +8,7 @@
   const { toasts, removeToast } = toastStore;
 </script>
 
-<div class="fixed right-0 top-14 z-[9999] flex flex-col items-end space-y-4 p-4">
+<div class="fixed right-0 top-14 z-40 flex flex-col items-end space-y-4 p-4">
   {#if $toasts && $toasts.length > 0}
     {#each $toasts as toast (toast.id)}
       <Toast

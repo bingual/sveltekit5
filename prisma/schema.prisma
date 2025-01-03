@@ -47,7 +47,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  memo          Memo[]
+  post          Post[]
 
   @@map("users")
 }
@@ -64,43 +64,43 @@ model VerificationToken {
 // 계정 끝
 
 // 메모 시작
-model MemoCategoryAssignment {
+model PostCategoryAssignment {
   id         String       @id @default(cuid())
-  memoId     String       @map("memo_id")
+  postId     String       @map("post_id")
   categoryId String       @map("category_id")
   createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt  DateTime     @updatedAt @map("updated_at") @db.Timestamptz()
-  memo       Memo         @relation(fields: [memoId], references: [id], onDelete: Cascade)
-  category   MemoCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  post       Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category   PostCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  @@unique([memoId, categoryId]) // 동일 메모가 동일 카테고리에 중복 등록되지 않도록 제한
-  @@map("memo_category_assignments")
+  @@unique([postId, categoryId]) // 동일 메모가 동일 카테고리에 중복 등록되지 않도록 제한
+  @@map("post_category_assignments")
 }
 
-model MemoCategory {
+model PostCategory {
   id            String                   @id @default(cuid())
   name          String                   @unique @db.VarChar(50)
   createdAt     DateTime                 @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt     DateTime                 @updatedAt @map("updated_at") @db.Timestamptz()
-  subCategories MemoSubCategory[]
-  assignments   MemoCategoryAssignment[]
+  subCategories PostSubCategory[]
+  assignments   PostCategoryAssignment[]
 
-  @@map("memo_categories")
+  @@map("post_categories")
 }
 
-model MemoSubCategory {
+model PostSubCategory {
   id         String       @id @default(cuid())
   categoryId String       @map("category_id")
   name       String       @db.VarChar(50)
   createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt  DateTime     @updatedAt @map("updated_at") @db.Timestamptz()
-  category   MemoCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category   PostCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@unique([name, categoryId]) // 같은 메인 카테고리 내에서는 중복 허용 안 함
-  @@map("memo_sub_categories")
+  @@map("post_sub_categories")
 }
 
-model Memo {
+model Post {
   id          String                   @id @default(cuid())
   author      String
   title       String                   @db.VarChar(100)
@@ -108,19 +108,19 @@ model Memo {
   createdAt   DateTime                 @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime                 @updatedAt @map("updated_at") @db.Timestamptz()
   user        User                     @relation(fields: [author], references: [id], onDelete: Cascade)
-  images      MemoImage[]
-  assignments MemoCategoryAssignment[]
+  images      PostImage[]
+  assignments PostCategoryAssignment[]
 
-  @@map("memos")
+  @@map("posts")
 }
 
-model MemoImage {
+model PostImage {
   id     String @id @default(cuid())
-  memoId String @map("memo_id")
+  postId String @map("post_id")
   url    String
-  memo   Memo   @relation(fields: [memoId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  @@map("memo_images")
+  @@map("post_images")
 }
 
 // 메모 끝

@@ -8,7 +8,7 @@ import { flatMap, isEmpty, join, map, omit, pipe, range } from 'remeda';
 import type { Actions } from './$types';
 
 export const actions = {
-  memoCreate: async ({ locals, request }) => {
+  postCreate: async ({ locals, request }) => {
     const session = await locals.auth();
 
     if (!session?.user?.id) {
@@ -67,7 +67,7 @@ export const actions = {
       };
     };
 
-    const fakeMemos = pipe(
+    const fakePosts = pipe(
       range(0, totalCount),
       map((index) => {
         const { content, imageUrls } = generateRandomHtml();
@@ -76,60 +76,60 @@ export const actions = {
           title: faker.lorem.sentence(),
           content: content,
           createdAt: new Date(now.getTime() - index * 1000),
-          memoImages: imageUrls,
+          postImages: imageUrls,
         };
       }),
     );
 
-    const [createdMemosCount] = await prisma.$transaction(async (prisma) => {
-      const createdMemosCount = await prisma.memo.createMany({
-        data: map(fakeMemos, (fakeMemo) => omit(fakeMemo, ['memoImages'])),
+    const [createdPostsCount] = await prisma.$transaction(async (prisma) => {
+      const createdPostsCount = await prisma.post.createMany({
+        data: map(fakePosts, (fakePost) => omit(fakePost, ['postImages'])),
         skipDuplicates: true,
       });
 
-      const createdMemos = await prisma.memo.findMany({
+      const createdPosts = await prisma.post.findMany({
         select: { id: true },
         where: { author: session?.user?.id },
         orderBy: { createdAt: 'desc' },
-        take: createdMemosCount.count,
+        take: createdPostsCount.count,
       });
 
       const createdImages = pipe(
-        createdMemos,
-        flatMap((memo, memoIndex) =>
+        createdPosts,
+        flatMap((post, postIndex) =>
           pipe(
-            fakeMemos[memoIndex].memoImages,
+            fakePosts[postIndex].postImages,
             map((imageUrl) => ({
-              memoId: memo.id,
+              postId: post.id,
               url: imageUrl,
             })),
           ),
         ),
       );
 
-      const fakeImagesCount = await prisma.memoImage.createMany({ data: createdImages });
+      const fakeImagesCount = await prisma.postImage.createMany({ data: createdImages });
 
-      return [createdMemosCount, createdImages, fakeImagesCount];
+      return [createdPostsCount, createdImages, fakeImagesCount];
     });
 
-    if (createdMemosCount.count > 0) {
+    if (createdPostsCount.count > 0) {
       return {
         success: true,
         action: 'create' as ActionType,
-        data: createdMemosCount.count,
+        data: createdPostsCount.count,
       };
     }
   },
-  memoDelete: async ({ locals }) => {
+  postDelete: async ({ locals }) => {
     const session = await locals.auth();
 
     if (!session?.user?.id) {
       return redirect(302, '/');
     }
 
-    const memoImages = await prisma.memoImage.findMany({
+    const postImages = await prisma.postImage.findMany({
       where: {
-        memo: {
+        post: {
           author: session?.user?.id,
         },
       },
@@ -137,22 +137,22 @@ export const actions = {
 
     const { removePublicStorageFile } = storageManager();
 
-    const urlsToDelete = map(memoImages, (image) => image.url);
+    const urlsToDelete = map(postImages, (image) => image.url);
     if (!isEmpty(urlsToDelete)) {
       await removePublicStorageFile(urlsToDelete);
     }
 
-    const memoDeleted = await prisma.memo.deleteMany({
+    const postDeleted = await prisma.post.deleteMany({
       where: {
         author: session?.user?.id,
       },
     });
 
-    if (memoDeleted.count > 0) {
+    if (postDeleted.count > 0) {
       return {
         success: true,
         action: 'delete' as ActionType,
-        data: memoDeleted.count,
+        data: postDeleted.count,
       };
     }
   },

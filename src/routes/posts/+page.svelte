@@ -4,10 +4,10 @@
   import { page } from '$app/state';
   import SearchBar from '$lib/components/SearchBar.svelte';
   import { actionMap } from '$lib/utils/mapping';
-  import type { MemoWithImages } from '$lib/utils/prismaTypes';
+  import type { PostWithImages } from '$lib/utils/prismaTypes';
   import { useContext } from '$lib/utils/stores';
   import { getPublicUrl } from '$lib/utils/variables';
-  import { generateNoDataMessage, handleMemoModal, useLoadMore } from '$lib/utils/variables.svelte';
+  import { generateNoDataMessage, handlePostModal, useLoadMore } from '$lib/utils/variables.svelte';
 
   import { Render } from '@jill64/svelte-sanitize';
   import { EditOutline, EyeOutline, TrashBinOutline } from 'flowbite-svelte-icons';
@@ -27,7 +27,7 @@
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
   const userInfo = $derived(page.data.session?.user);
-  const isMemos = $derived(isEmpty(data.memos));
+  const isPosts = $derived(isEmpty(data.posts));
   const noDataMessage = $derived(generateNoDataMessage());
 
   const items = [
@@ -64,15 +64,15 @@
     return plainText.replace(/[\r\n]+/g, ' ').trim();
   };
 
-  const extractThumbnail = (memo: MemoWithImages) => {
-    if (memo?.images?.[0]?.url) {
-      return memo.images[0].url.startsWith('https://')
-        ? memo.images[0].url
-        : getPublicUrl(memo.images[0].url);
+  const extractThumbnail = (post: PostWithImages) => {
+    if (post?.images?.[0]?.url) {
+      return post.images[0].url.startsWith('https://')
+        ? post.images[0].url
+        : getPublicUrl(post.images[0].url);
     }
 
     const regex = /<img[^>]*src=["']([^"']+)["']/i;
-    const match = memo.content.match(regex);
+    const match = post.content.match(regex);
 
     return match ? match[1] : '/images/noImage.jpg';
   };
@@ -94,23 +94,23 @@
 <div class="min-h-screen @container">
   <SearchBar {items} />
 
-  {#if !isMemos}
+  {#if !isPosts}
     <!-- 그리드 -->
     <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-      {#each data.memos as memo}
+      {#each data.posts as post}
         <Card
           class="relative"
           size="md"
           img={{
-            src: extractThumbnail(memo),
-            alt: memo.title || 'Default Title',
+            src: extractThumbnail(post),
+            alt: post.title || 'Default Title',
           }}
         >
           <div class="pb-16">
-            <Heading class="mb-5 line-clamp-2 whitespace-pre-line" tag="h3">{memo.title}</Heading>
+            <Heading class="mb-5 line-clamp-2 whitespace-pre-line" tag="h3">{post.title}</Heading>
 
             <P class="line-clamp-4 whitespace-pre-line">
-              <Render html={extractPlainText(memo.content)} />
+              <Render html={extractPlainText(post.content)} />
             </P>
           </div>
 
@@ -118,17 +118,17 @@
           <div
             class="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-x-3 p-3"
           >
-            <Button onclick={() => goto(`/memo/${memo.id}`)}>
+            <Button onclick={() => goto(`/posts/${post.id}`)}>
               <EyeOutline />
             </Button>
 
             {#if userInfo?.id}
               <div class="flex gap-x-2">
-                <Button color="green" onclick={() => handleMemoModal(setModal, 'update', memo)}>
+                <Button color="green" onclick={() => handlePostModal(setModal, 'update', post)}>
                   <EditOutline />
                 </Button>
                 <form use:enhance={handleDelete} method="POST" action="?/delete">
-                  <Input type="hidden" name="id" value={memo.id} />
+                  <Input type="hidden" name="id" value={post.id} />
                   <Button color="red" type="submit"><TrashBinOutline /></Button>
                 </form>
               </div>
@@ -139,20 +139,20 @@
     </div>
 
     <!-- 페이지네이션 -->
-    {#if data.memoTotalCount > interval}
+    {#if data.postTotalCount > interval}
       <div class="mt-10 grid place-items-center">
         <div class="text-center">
-          {#if data.memoTotalCount > $currentTake}
+          {#if data.postTotalCount > $currentTake}
             <Button class="w-full rounded-none" size="lg" color="dark" onclick={loadMoreData}
               >더 보기</Button
             >
           {/if}
 
           <div class="mt-2">
-            {`${data.memoTotalCount}개 목록 중 ${data.memos.length}개를 보셨습니다.`}
+            {`${data.postTotalCount}개 목록 중 ${data.posts.length}개를 보셨습니다.`}
           </div>
 
-          {#if data.memoTotalCount <= $currentTake}
+          {#if data.postTotalCount <= $currentTake}
             <div class="mt-2">
               <button class="underline" onclick={async () => await goto('#')}>
                 첫 번째 페이지로 이동
