@@ -1,15 +1,6 @@
 <script lang="ts">
-  import { dev } from '$app/environment';
-  import { page } from '$app/state';
-
   import clsx from 'clsx';
-  import {
-    ClipboardListOutline,
-    CogOutline,
-    LightbulbOutline,
-    ListMusicOutline,
-    PenNibOutline,
-  } from 'flowbite-svelte-icons';
+  import { AnnotationOutline, ClipboardListOutline, CogOutline } from 'flowbite-svelte-icons';
   import {
     Sidebar,
     SidebarDropdownWrapper,
@@ -19,8 +10,6 @@
   } from 'svelte-5-ui-lib';
 
   const { sidebarUi }: { sidebarUi: ReturnType<typeof uiHelpers> } = $props();
-
-  const userInfo = $derived(page.data.session?.user);
 
   const spanClass = clsx('flex-1 ms-3 whitespace-nowrap xs:text-base text-xs');
   const iconClass = clsx(
@@ -55,31 +44,31 @@
     {
       options: [{ border: false }],
       items: [
-        { label: '소개', href: '/', icon: ClipboardListOutline },
-        { label: '포스트', href: '/general/posts', icon: PenNibOutline },
         {
-          label: '플레이리스트',
-          icon: ListMusicOutline,
-          children: [{ childLabel: '멜론차트', childHref: '/general/playlist/melonChart' }],
+          label: '콘텐츠',
+          icon: ClipboardListOutline,
+          children: [
+            { childLabel: '글관리', childHref: '#' },
+            { childLabel: '카테고리 관리', childHref: '#' },
+            { childLabel: '공지 관리', childHref: '#' },
+            { childLabel: '서식 관리', childHref: '#' },
+            { childLabel: '설정', childHref: '#' },
+          ],
         },
-      ],
-    },
-    {
-      options: [{ border: true }],
-      items: [
-        ...(dev && userInfo
-          ? [
-              {
-                label: '테스트',
-                icon: LightbulbOutline,
-                children: [{ childLabel: '데이터 생성/제거', childHref: '/tests/fake-data' }],
-              },
-            ]
-          : []),
+        {
+          label: '댓글·방명록',
+          icon: AnnotationOutline,
+          children: [
+            { childLabel: '댓글 관리', childHref: '#' },
+            { childLabel: '방명록 관리', childHref: '#' },
+            { childLabel: '공지 관리', childHref: '#' },
+            { childLabel: '설정', childHref: '#' },
+          ],
+        },
         {
           label: '관리',
           icon: CogOutline,
-          href: '#',
+          children: [{ childLabel: '블로그', childHref: '#' }],
         },
       ],
     },

@@ -1,6 +1,11 @@
 <script lang="ts">
-  import type { PostWithImages } from '$lib/utils/prismaTypes';
+  import { enhance } from '$app/forms';
+  import { goto } from '$app/navigation';
+  import Alert from '$lib/components/Alert.svelte';
+  import SetImage from '$lib/components/modals/SetImage.svelte';
+  import { useContext } from '$lib/utils/stores';
 
+  import type { SubmitFunction } from '@sveltejs/kit';
   import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
   import { Color } from '@tiptap/extension-color';
   import { Link } from '@tiptap/extension-link';
@@ -20,9 +25,18 @@
   import ts from 'highlight.js/lib/languages/typescript';
   import html from 'highlight.js/lib/languages/xml';
   import { createLowlight } from 'lowlight';
-  import { map } from 'remeda';
-  import type { Readable, Writable } from 'svelte/store';
-  import { Tooltip } from 'svelte-5-ui-lib';
+  import { forEach, isEmpty, map } from 'remeda';
+  import { type Readable, writable } from 'svelte/store';
+  import {
+    Button,
+    FloatingLabelInput,
+    Footer,
+    FooterCopyright,
+    FooterLi,
+    FooterUl,
+    Tooltip,
+    uiHelpers,
+  } from 'svelte-5-ui-lib';
   import {
     Bars3,
     Bars3BottomLeft,
@@ -41,11 +55,24 @@
     ListBullet,
     Minus,
     NumberedList,
+    Photo,
     Strikethrough,
     Underline as UnderlineIcon,
   } from 'svelte-hero-icons';
   import { createEditor, Editor, EditorContent } from 'svelte-tiptap';
   import ImageResize from 'tiptap-extension-resize-image';
+
+  const { isLoading } = useContext();
+
+  const {
+    post,
+  }: {
+    post?: {
+      id: string;
+      title: string;
+      content: string;
+    };
+  } = $props();
 
   const lowlight = createLowlight();
   lowlight.register('html', html);
@@ -58,17 +85,17 @@
   lowlight.register('bash', bash);
   lowlight.register('shell', shell);
 
-  let {
-    postData,
-    editorContent = $bindable(),
-    filePreviews: parentFilePreviews,
-  }: {
-    postData: PostWithImages | undefined;
-    editorContent: Writable<string | undefined>;
-    filePreviews: Writable<FilePreview[]>;
-  } = $props();
+  const imageModalUi = uiHelpers();
+
+  let formId = $state('SetPostForm');
+  let errors = $state<ValidationError[]>([]);
+
+  let selectedFiles = writable<FileList | undefined>();
+  let filePreviews = writable<FilePreview[]>([]);
 
   let editor = $state() as Readable<Editor>;
+  let editorContent = writable(post?.content);
+
   let lastProcessedUrls: string[] = $state([]);
 
   const buttonGroups = $state([
@@ -164,6 +191,12 @@
       groupName: '기타',
       buttons: [
         {
+          name: '이미지',
+          icon: Photo,
+          action: () => imageModalUi.toggle(),
+          check: () => null,
+        },
+        {
           name: '코드',
           icon: CodeBracket,
           action: () => $editor?.chain().focus().toggleCode().run(),
@@ -203,6 +236,22 @@
     },
   ]);
 
+  const handleSubmit: SubmitFunction = () => {
+    isLoading.set(true);
+    return async ({ result, update }) => {
+      if (result.type === 'failure') {
+        const validRes = result.data as ValidationResponse;
+        if (!validRes?.success && !isEmpty(validRes.errors)) {
+          errors = validRes.errors;
+          await goto('#alert');
+        }
+      } else {
+        await update();
+      }
+      isLoading.set(false);
+    };
+  };
+
   const addImagesAsBlock = async (urls: string[]) => {
     if (urls.length > 0) {
       const imageHTML = map(urls, (url) => `<img src="${url}" alt="">`).join(' ');
@@ -210,6 +259,16 @@
       $editor.chain().focus().insertContent(imageHTML).run();
     }
   };
+
+  $effect(() => {
+    return () => {
+      errors = [];
+      if (!isEmpty($filePreviews)) {
+        forEach($filePreviews, (file) => URL.revokeObjectURL(file.src));
+        $filePreviews = [];
+      }
+    };
+  });
 
   $effect(() => {
     editor = createEditor({
@@ -291,7 +350,7 @@
           },
         }),
       ],
-      content: postData?.content,
+      content: post?.content,
       onUpdate: ({ editor }) => {
         editorContent.set(editor.getHTML());
       },
@@ -299,7 +358,7 @@
   });
 
   $effect(() => {
-    const urls = map($parentFilePreviews, ({ src }) => src);
+    const urls = map($filePreviews, ({ src }) => src);
 
     if (
       urls.length === lastProcessedUrls.length &&
@@ -314,8 +373,14 @@
 </script>
 
 <div>
+  {#if !isEmpty(errors)}
+    <Alert {errors} />
+  {/if}
+</div>
+
+<div class="sticky top-[60px] z-40 border-b-2 bg-white p-4 dark:border-gray-600 dark:bg-gray-900">
   {#if $editor}
-    <div class="flex items-center space-x-4 space-y-1">
+    <div class="flex items-center justify-center space-x-4 space-y-1">
       {#each buttonGroups as group}
         <div class="flex flex-wrap gap-1">
           {#each group.buttons as btn}
@@ -347,8 +412,37 @@
 </div>
 
 <div class="mt-5">
-  <EditorContent
-    class="prose prose-sm max-w-none dark:prose-invert xs:prose-base"
-    editor={$editor}
-  />
+  <form
+    use:enhance={handleSubmit}
+    id={formId}
+    method="POST"
+    action={post?.id ? '?/update' : '?/create'}
+    enctype="multipart/form-data"
+  >
+    <input type="hidden" name="id" value={post?.id} />
+    <input type="hidden" name="content" bind:value={$editorContent} />
+    <input type="file" hidden={true} name="images" bind:files={$selectedFiles} multiple />
+
+    <FloatingLabelInput inputClass={clsx('text-2xl')} id="title" name="title" value={post?.title}>
+      제목을 입력하세요
+    </FloatingLabelInput>
+
+    <EditorContent
+      class="prose prose-sm mb-24 mt-5 max-w-none dark:prose-invert xs:prose-base"
+      editor={$editor}
+    />
+  </form>
 </div>
+
+<Footer footerType="sticky" class="bottom-0 flex !items-center !justify-between">
+  <FooterCopyright href="/" by="Adora™" />
+  <FooterUl
+    class="mt-3 flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 sm:mt-0"
+  >
+    <FooterLi><Button form={formId} type="submit">완료</Button></FooterLi>
+  </FooterUl>
+</Footer>
+
+{#if imageModalUi.isOpen}
+  <SetImage {imageModalUi} {selectedFiles} {filePreviews} />
+{/if}

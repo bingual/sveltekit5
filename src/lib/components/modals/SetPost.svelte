@@ -3,7 +3,6 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import Alert from '$lib/components/Alert.svelte';
-  import MarkDownEditor from '$lib/components/MarkDownEditor.svelte';
   import SetImage from '$lib/components/modals/SetImage.svelte';
   import { actionMap } from '$lib/utils/mapping';
   import type { PostWithImages } from '$lib/utils/prismaTypes';
@@ -67,7 +66,6 @@
   });
 </script>
 
-<!-- FIXME: 현재 svelte-5-ui-lib 베타버전 모달은 X축 반응형 동작에 버그있음. 모바일 환경에서 치명적임-->
 <Modal
   title={$modalTitle}
   {modalStatus}
@@ -103,9 +101,7 @@
           />
         </div>
 
-        <div class="mt-5">
-          <MarkDownEditor {postData} {editorContent} {filePreviews} />
-        </div>
+        <div class="mt-5"></div>
       </div>
     </form>
   </div>

@@ -1,7 +1,5 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { useContext } from '$lib/utils/stores';
-  import { handlePostModal } from '$lib/utils/variables.svelte';
 
   import { SignIn, SignOut } from '@auth/sveltekit/components';
   import clsx from 'clsx';
@@ -23,10 +21,6 @@
     NavUl,
     uiHelpers,
   } from 'svelte-5-ui-lib';
-
-  const {
-    modalStore: { setModal },
-  } = useContext();
 
   const userInfo = $derived(page.data.session?.user);
 
@@ -89,13 +83,8 @@
               </DropdownHeader>
 
               <DropdownUl>
-                <DropdownLi href="#">관리</DropdownLi>
-                <DropdownLi
-                  href="/general/posts"
-                  onclick={async () => {
-                    handlePostModal(setModal, 'create');
-                  }}>글쓰기</DropdownLi
-                >
+                <DropdownLi href="/manage">관리</DropdownLi>
+                <DropdownLi href="/manage/newPost">글쓰기</DropdownLi>
               </DropdownUl>
 
               <DropdownFooter class="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600">

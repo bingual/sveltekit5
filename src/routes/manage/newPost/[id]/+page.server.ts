@@ -4,23 +4,24 @@ import { sanitizeContents } from '$lib/utils/variables.server';
 
 import { redirect } from '@sveltejs/kit';
 
-import type { Actions } from './$types';
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
   const { id } = params;
 
   const post = await prisma.post.findFirst({
+    select: {
+      id: true,
+      title: true,
+      content: true,
+    },
     where: {
       id: id,
-    },
-    include: {
-      user: true,
     },
   });
 
   if (!post) {
-    return redirect(302, '/general/posts');
+    return redirect(302, '/manage');
   }
 
   if (post) {
@@ -30,15 +31,13 @@ export const load: PageServerLoad = async ({ params }) => {
         id: post.id,
         title: post.title,
         content: sanitizePost,
-        createdAt: post.createdAt,
-        user: post.user,
       },
     };
   }
 };
 
 export const actions = {
-  delete: async ({ locals, request }) => {
-    return await postAction(locals, request, 'delete');
+  update: async ({ locals, request }) => {
+    return await postAction(locals, request, 'update');
   },
 } satisfies Actions;

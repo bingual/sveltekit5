@@ -7,7 +7,6 @@ import { scrapManager } from './scraper';
 
 const { setupBrowser, getEmptyFieldNames } = scrapManager();
 
-// TODO: 프로젝트 방향성 정해지면 cronjob 돌려서 1주일 마다 스크래핑 하는 코드 추가하기
 const scrapYoutubePlaylist = async () => {
   const getPlaylist = async (page: Page) => {
     return await page

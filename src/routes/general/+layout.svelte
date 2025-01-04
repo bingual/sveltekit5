@@ -1,6 +1,6 @@
 <script>
-  import Navbar from '$lib/components/layouts/Navbar.svelte';
-  import Sidebar from '$lib/components/layouts/Sidebar.svelte';
+  import Navbar from '$lib/components/layouts/general/Navbar.svelte';
+  import Sidebar from '$lib/components/layouts/general/Sidebar.svelte';
 
   import { uiHelpers } from 'svelte-5-ui-lib';
 
