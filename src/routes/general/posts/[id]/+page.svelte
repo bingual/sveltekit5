@@ -5,7 +5,6 @@
   import { actionMap } from '$lib/utils/mapping';
   import { useContext } from '$lib/utils/stores';
 
-  import { Render } from '@jill64/svelte-sanitize';
   import type { SubmitFunction } from '@sveltejs/kit';
   import { formatInTimeZone } from 'date-fns-tz';
   import hljs from 'highlight.js';
@@ -99,6 +98,7 @@
   </div>
 
   <div class="prose prose-sm max-w-none dark:prose-invert xs:prose-base">
-    <Render html={data.post.content ?? ''} />
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+    {@html data.post.content}
   </div>
 </div>

@@ -5,7 +5,6 @@
   import { getPublicUrl } from '$lib/utils/variables';
   import { generateNoDataMessage, useLoadMore } from '$lib/utils/variables.svelte.js';
 
-  import { Render } from '@jill64/svelte-sanitize';
   import { formatInTimeZone } from 'date-fns-tz';
   import { isEmpty } from 'remeda';
   import { Button, Card, Heading, P } from 'svelte-5-ui-lib';
@@ -72,7 +71,8 @@
             <Heading class="mb-5 line-clamp-2 whitespace-pre-line" tag="h3">{post.title}</Heading>
 
             <P class="line-clamp-4 whitespace-pre-line">
-              <Render html={extractPlainText(post.content)} />
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+              {@html extractPlainText(post.content)}
             </P>
 
             <P class="mt-5">{formatInTimeZone(post.createdAt, 'Asia/Seoul', 'yyyy-MM-dd')}</P>

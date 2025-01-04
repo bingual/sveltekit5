@@ -1,6 +1,5 @@
 import { prisma } from '$lib/prisma';
 import { postAction } from '$lib/server/action/handler.server';
-import { sanitizeContents } from '$lib/utils/variables.server';
 
 import { redirect } from '@sveltejs/kit';
 
@@ -20,19 +19,12 @@ export const load: PageServerLoad = async ({ params }) => {
     },
   });
 
-  if (!post) {
-    return redirect(302, '/manage');
-  }
-
   if (post) {
-    const sanitizePost = sanitizeContents(post.content) as string;
     return {
-      post: {
-        id: post.id,
-        title: post.title,
-        content: sanitizePost,
-      },
+      post,
     };
+  } else {
+    return redirect(302, '/manage');
   }
 };
 

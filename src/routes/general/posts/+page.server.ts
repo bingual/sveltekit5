@@ -1,7 +1,5 @@
 import { ROOT_USER } from '$env/static/private';
 import { prisma } from '$lib/prisma';
-import { PostWithImages } from '$lib/utils/prismaTypes';
-import { sanitizeContents } from '$lib/utils/variables.server';
 
 import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ parent, url }) => {
@@ -55,10 +53,8 @@ export const load: PageServerLoad = async ({ parent, url }) => {
     }),
   ]);
 
-  const sanitizePosts = sanitizeContents(posts) as PostWithImages[];
-
   return {
-    posts: sanitizePosts,
+    posts,
     postTotalCount,
   };
 };
