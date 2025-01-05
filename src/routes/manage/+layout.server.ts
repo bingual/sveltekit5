@@ -6,7 +6,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
   const session = await locals.auth();
 
   if (!session?.user?.id) {
-    return redirect(302, '/');
+    return redirect(302, '/general');
   }
 
   return {

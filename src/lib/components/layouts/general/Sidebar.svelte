@@ -54,7 +54,7 @@
     {
       options: [{ border: false }],
       items: [
-        { label: '소개', href: '/', icon: ClipboardListOutline },
+        { label: '소개', href: '/general', icon: ClipboardListOutline },
         { label: '포스트', href: '/general/posts', icon: PenNibOutline },
         {
           label: '플레이리스트',

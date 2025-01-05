@@ -55,7 +55,7 @@
     hamburgerMenu={false}
   >
     {#snippet brand()}
-      <NavBrand siteName="Adora">
+      <NavBrand href="/general" siteName="Adora">
         <Img imgClass={clsx('w-10')} src="/images/Adora.png" alt="svelte icon" />
       </NavBrand>
     {/snippet}

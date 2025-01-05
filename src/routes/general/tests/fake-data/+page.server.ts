@@ -12,7 +12,7 @@ export const actions = {
     const session = await locals.auth();
 
     if (!session?.user?.id) {
-      return redirect(302, '/');
+      return redirect(302, '/general');
     }
 
     const formData = Object.fromEntries(await request.formData());
@@ -124,7 +124,7 @@ export const actions = {
     const session = await locals.auth();
 
     if (!session?.user?.id) {
-      return redirect(302, '/');
+      return redirect(302, '/general');
     }
 
     const postImages = await prisma.postImage.findMany({
