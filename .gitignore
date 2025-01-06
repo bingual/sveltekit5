@@ -315,5 +315,5 @@ vite.config.ts.timestamp-*
 #tests
 test.ts
 test-results
-src/routes/general/tests/+page.svelte
-src/routes/general/tests/+page.server.ts
+src/routes/manage/tests/+page.svelte
+src/routes/manage/tests/+page.server.ts

@@ -11,10 +11,6 @@ export const load: LayoutServerLoad = async ({ parent }) => {
     return redirect(302, '/404');
   }
 
-  if (!session?.user?.id) {
-    return redirect(302, '/general');
-  }
-
   return {
     session,
   };

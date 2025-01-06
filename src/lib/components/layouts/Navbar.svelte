@@ -45,7 +45,9 @@
   let dummy = $state(false);
 </script>
 
-<div>
+<header
+  class="sticky top-0 z-50 mx-auto w-full flex-none border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
+>
   <Navbar
     navClass={clsx(
       'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 divide-gray-200 dark:divide-gray-700 px-2 sm:px-4 w-full',
@@ -83,7 +85,7 @@
               </DropdownHeader>
 
               <DropdownUl>
-                <DropdownLi href="#">관리</DropdownLi>
+                <DropdownLi href="/manage">관리</DropdownLi>
                 <DropdownLi href="/manage/newPost">글쓰기</DropdownLi>
               </DropdownUl>
 
@@ -120,9 +122,7 @@
             {/if}
           </Dropdown>
         </div>
-        {#if !page.url.pathname.includes('newPost')}
-          <NavHamburger {toggleNav} />
-        {/if}
+        <NavHamburger {toggleNav} />
       </div>
     {/snippet}
 
@@ -132,4 +132,4 @@
       </NavUl>
     {/if}
   </Navbar>
-</div>
+</header>

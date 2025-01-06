@@ -22,6 +22,27 @@ declare global {
     errors: ValidationError[];
   }
 
+  interface SidebarOption {
+    border: boolean;
+  }
+
+  interface SidebarChildItem {
+    childLabel: string;
+    childHref: string;
+  }
+
+  interface SidebarItem {
+    label: string;
+    href?: string;
+    icon: any;
+    children?: SidebarChildItem[];
+  }
+
+  interface SidebarSection {
+    options: SidebarOption[];
+    items: SidebarItem[];
+  }
+
   // types
   type ActionType = 'create' | 'update' | 'delete';
 

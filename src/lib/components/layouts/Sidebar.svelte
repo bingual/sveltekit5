@@ -1,6 +1,5 @@
 <script lang="ts">
   import clsx from 'clsx';
-  import { AnnotationOutline, ClipboardListOutline, CogOutline } from 'flowbite-svelte-icons';
   import {
     Sidebar,
     SidebarDropdownWrapper,
@@ -9,7 +8,10 @@
     type uiHelpers,
   } from 'svelte-5-ui-lib';
 
-  const { sidebarUi }: { sidebarUi: ReturnType<typeof uiHelpers> } = $props();
+  const {
+    sidebarUi,
+    sections,
+  }: { sidebarUi: ReturnType<typeof uiHelpers>; sections: SidebarSection[] } = $props();
 
   const spanClass = clsx('flex-1 ms-3 whitespace-nowrap xs:text-base text-xs');
   const iconClass = clsx(
@@ -18,61 +20,6 @@
 
   let isOpen = $state(false);
   const closeDemoSidebar = sidebarUi.close;
-
-  interface Option {
-    border: boolean;
-  }
-
-  interface ChildItem {
-    childLabel: string;
-    childHref: string;
-  }
-
-  interface Item {
-    label: string;
-    href?: string;
-    icon: any;
-    children?: ChildItem[];
-  }
-
-  interface Section {
-    options: Option[];
-    items: Item[];
-  }
-
-  const sections: Section[] = $derived([
-    {
-      options: [{ border: false }],
-      items: [
-        {
-          label: '콘텐츠',
-          icon: ClipboardListOutline,
-          children: [
-            { childLabel: '글관리', childHref: '#' },
-            { childLabel: '카테고리 관리', childHref: '#' },
-            { childLabel: '공지 관리', childHref: '#' },
-            { childLabel: '서식 관리', childHref: '#' },
-            { childLabel: '설정', childHref: '#' },
-          ],
-        },
-        {
-          label: '댓글·방명록',
-          icon: AnnotationOutline,
-          children: [
-            { childLabel: '댓글 관리', childHref: '#' },
-            { childLabel: '방명록 관리', childHref: '#' },
-            { childLabel: '공지 관리', childHref: '#' },
-            { childLabel: '설정', childHref: '#' },
-          ],
-        },
-        {
-          label: '관리',
-          icon: CogOutline,
-          children: [{ childLabel: '블로그', childHref: '#' }],
-        },
-      ],
-    },
-  ]);
 
   $effect(() => {
     isOpen = sidebarUi.isOpen;

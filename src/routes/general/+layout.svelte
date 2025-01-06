@@ -1,21 +1,33 @@
-<script>
-  import Navbar from '$lib/components/layouts/general/Navbar.svelte';
-  import Sidebar from '$lib/components/layouts/general/Sidebar.svelte';
+<script lang="ts">
+  import Navbar from '$lib/components/layouts/Navbar.svelte';
+  import Sidebar from '$lib/components/layouts/Sidebar.svelte';
 
+  import { ClipboardListOutline, ListMusicOutline, PenNibOutline } from 'flowbite-svelte-icons';
   import { uiHelpers } from 'svelte-5-ui-lib';
 
   let { children } = $props();
   const sidebarUi = uiHelpers();
+
+  const sections: SidebarSection[] = $derived([
+    {
+      options: [{ border: false }],
+      items: [
+        { label: '소개', href: '/general', icon: ClipboardListOutline },
+        { label: '포스트', href: '/general/posts', icon: PenNibOutline },
+        {
+          label: '플레이리스트',
+          icon: ListMusicOutline,
+          children: [{ childLabel: '멜론차트', childHref: '/general/playlist/melonChart' }],
+        },
+      ],
+    },
+  ]);
 </script>
 
-<header
-  class="sticky top-0 z-50 mx-auto w-full flex-none border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
->
-  <Navbar {sidebarUi} />
-</header>
+<Navbar {sidebarUi} />
 
 <div class="w-full dark:bg-gray-900 lg:flex">
-  <Sidebar {sidebarUi} />
+  <Sidebar {sidebarUi} {sections} />
   <main class="w-full min-w-0 md:ml-64 lg:static lg:max-h-full lg:overflow-visible">
     <div class="w-full">
       <div
