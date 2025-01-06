@@ -36,7 +36,7 @@ export const postAction = async (locals: App.Locals, request: Request, actionTyp
           where: {
             postId: formValidation.data?.id,
             post: {
-              author: session?.user?.id,
+              userId: session?.user?.id,
             },
           },
         });
@@ -48,7 +48,7 @@ export const postAction = async (locals: App.Locals, request: Request, actionTyp
 
         const deletedPost = await prisma.post.delete({
           where: {
-            author: session?.user?.id,
+            userId: session?.user?.id,
             id: formValidation.data?.id,
           },
         });
@@ -84,7 +84,7 @@ export const postAction = async (locals: App.Locals, request: Request, actionTyp
         if (actionType === 'create') {
           const createdPost = await prisma.post.create({
             data: {
-              author: session?.user?.id,
+              userId: session?.user?.id,
               title: title,
               content: sanitizedPosts,
               images: {
@@ -111,7 +111,7 @@ export const postAction = async (locals: App.Locals, request: Request, actionTyp
             where: {
               postId: formValidation.data?.id,
               post: {
-                author: session?.user?.id,
+                userId: session?.user?.id,
               },
             },
           });
@@ -129,12 +129,12 @@ export const postAction = async (locals: App.Locals, request: Request, actionTyp
           const [updatedPost] = await prisma.$transaction(async (prisma) => {
             const updatedPost = await prisma.post.update({
               data: {
-                author: session?.user?.id,
+                userId: session?.user?.id,
                 title: title,
                 content: sanitizedPosts,
               },
               where: {
-                author: session?.user?.id,
+                userId: session?.user?.id,
                 id: id,
               },
             });

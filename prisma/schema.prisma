@@ -40,14 +40,15 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String?   @unique
-  emailVerified DateTime? @map("email_verified")
+  email         String?        @unique
+  emailVerified DateTime?      @map("email_verified")
   image         String?
   accounts      Account[]
   sessions      Session[]
   post          Post[]
+  postCategory  PostCategory[]
 
   @@map("users")
 }
@@ -63,27 +64,18 @@ model VerificationToken {
 
 // 계정 끝
 
-// 메모 시작
-model PostCategoryAssignment {
-  id         String       @id @default(cuid())
-  postId     String       @map("post_id")
-  categoryId String       @map("category_id")
-  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt  DateTime     @updatedAt @map("updated_at") @db.Timestamptz()
-  post       Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
-  category   PostCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  @@unique([postId, categoryId]) // 동일 메모가 동일 카테고리에 중복 등록되지 않도록 제한
-  @@map("post_category_assignments")
-}
+// 포스트 시작
 
 model PostCategory {
-  id            String                   @id @default(cuid())
-  name          String                   @unique @db.VarChar(50)
-  createdAt     DateTime                 @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt     DateTime                 @updatedAt @map("updated_at") @db.Timestamptz()
-  subCategories PostSubCategory[]
-  assignments   PostCategoryAssignment[]
+  id          String            @id @default(cuid())
+  userId      String            @map("user_id")
+  name        String            @unique @db.VarChar(50)
+  isPrivate   Boolean           @default(false) @map("is_private")
+  createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime          @updatedAt @map("updated_at") @db.Timestamptz()
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subCategory PostSubCategory[]
+  post        Post[]
 
   @@map("post_categories")
 }
@@ -101,15 +93,17 @@ model PostSubCategory {
 }
 
 model Post {
-  id          String                   @id @default(cuid())
-  author      String
-  title       String                   @db.VarChar(100)
-  content     String
-  createdAt   DateTime                 @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt   DateTime                 @updatedAt @map("updated_at") @db.Timestamptz()
-  user        User                     @relation(fields: [author], references: [id], onDelete: Cascade)
-  images      PostImage[]
-  assignments PostCategoryAssignment[]
+  id         String        @id @default(cuid())
+  userId     String        @map("user_id")
+  categoryId String?       @map("category_id")
+  title      String        @db.VarChar(100)
+  content    String
+  isPrivate  Boolean       @default(false) @map("is_private")
+  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   PostCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  images     PostImage[]
 
   @@map("posts")
 }
@@ -123,7 +117,7 @@ model PostImage {
   @@map("post_images")
 }
 
-// 메모 끝
+// 포스트 끝
 
 // 기타 시작
 model YouTubePlaylist {

@@ -72,7 +72,7 @@ export const actions = {
       map((index) => {
         const { content, imageUrls } = generateRandomHtml();
         return {
-          author: session?.user?.id,
+          userId: session?.user?.id,
           title: faker.lorem.sentence(),
           content: content,
           createdAt: new Date(now.getTime() - index * 1000),
@@ -89,7 +89,7 @@ export const actions = {
 
       const createdPosts = await prisma.post.findMany({
         select: { id: true },
-        where: { author: session?.user?.id },
+        where: { userId: session?.user?.id },
         orderBy: { createdAt: 'desc' },
         take: createdPostsCount.count,
       });
@@ -130,7 +130,7 @@ export const actions = {
     const postImages = await prisma.postImage.findMany({
       where: {
         post: {
-          author: session?.user?.id,
+          userId: session?.user?.id,
         },
       },
     });
@@ -144,7 +144,7 @@ export const actions = {
 
     const postDeleted = await prisma.post.deleteMany({
       where: {
-        author: session?.user?.id,
+        userId: session?.user?.id,
       },
     });
 
